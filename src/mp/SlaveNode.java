@@ -1,33 +1,33 @@
 package mp;
+import java.util.ArrayList;
 import java.util.List;
 
-public class SlaveNode extends Node{
-    private SlaveNode(NodeBuilder builder){
+public class SlaveNode extends Node {
+    Unicast u;
+
+    public SlaveNode(NodeBuilder builder) {
         this.node_entry = builder.node_entry;
         this.figure_table = builder.figure_table;
         this.predecessor_pointer = builder.predecessor_pointer;
         this.key_container = builder.key_container;
     }
 
-    private static class NodeBuilder{
+    static class NodeBuilder {
         private final NodeEntry node_entry;
         private List<NodeEntry> figure_table;
         private NodeEntry predecessor_pointer;
         private List<Integer> key_container;
 
-        public NodeBuilder(NodeEntry node_entry){
+        private final Unicast u;
+
+        public NodeBuilder(NodeEntry node_entry, Unicast u){
             this.node_entry = node_entry;
-        }
-        public NodeBuilder figureTable(List<NodeEntry> figure_table){
-            this.figure_table = figure_table;
-            return  this;
+            this.u = u;
+            this.figure_table = new ArrayList<NodeEntry>();
+            this.key_container = new ArrayList<Integer>();
         }
         public NodeBuilder predecessorPointer(NodeEntry predecessor_pointer){
             this.predecessor_pointer = predecessor_pointer;
-            return this;
-        }
-        public NodeBuilder keyContainer(List<Integer> key_container){
-            this.key_container = key_container;
             return this;
         }
         public SlaveNode build(){
@@ -40,21 +40,21 @@ public class SlaveNode extends Node{
 
     // join p
     @ Override
-    public  void join(){};
+    public void join() {};
 
     // find p k
     @ Override
-    public  void find(int k){};
+    public void find(int k) {};
 
     // crash p
     @ Override
-    public void crash(){};
+    public void crash() {};
 
     // show p
     @ Override
-    public void show(){};
+    public void show() {};
 
-    public static void main(String[] args){
+    public static void main(String[] args) {
 
     }
 }

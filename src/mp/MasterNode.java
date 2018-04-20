@@ -7,7 +7,7 @@ public class MasterNode extends Node {
     // builder pattern
     Config hostInfo;
     Unicast u;
-    private MasterNode(NodeBuilder builder) throws IOException{
+    public MasterNode(NodeBuilder builder) throws IOException {
         hostInfo= Config.parseConfig("configFile");
         u = new Unicast(builder.node_entry.address, node_entry.port, hostInfo);
         this.node_entry = builder.node_entry;
@@ -16,7 +16,7 @@ public class MasterNode extends Node {
         this.key_container = builder.key_container;
     }
 
-    private static class NodeBuilder{
+    public static class NodeBuilder {
         private final NodeEntry node_entry;
         private  List<NodeEntry> figure_table;
         private NodeEntry predecessor_pointer;
@@ -49,24 +49,25 @@ public class MasterNode extends Node {
 
     // join p
     @ Override
-    public  void join(){};
+    public void join() {};
 
     // find p k
     @ Override
-    public  void find(int k){};
+    public void find(int k) {};
 
     // crash p
     @ Override
-    public void crash(){};
+    public void crash() {};
 
     // show p
     @ Override
-    public void show(){};
+    public void show() {};
 
-    public static void main(String[] args) throws IOException{
-        NodeEntry node_entry = new NodeEntry(0, "127.0.0.1", 3002);
+    public static void main(String[] args) throws IOException {
+        NodeEntry node_entry = new NodeEntry(0, "127.0.0.1", 3000);
         List<NodeEntry> figure_table = new ArrayList<>();
-        figure_table.add(node_entry);
+        for(int i = 0; i < 8; ++i)
+            figure_table.add(node_entry);
         MasterNode masterNode = new NodeBuilder(node_entry).figureTable(figure_table).build();
     }
 }
