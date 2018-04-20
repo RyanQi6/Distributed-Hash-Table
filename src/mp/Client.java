@@ -19,9 +19,10 @@ public class Client {
 
     // join
     public void join(int p) throws IOException {
-//        Unicast u = new Unicast("127.0.0.1", 3000 + p, Config.parseConfig("configFile"));
-//        SlaveNode n = new SlaveNode.NodeBuilder(new NodeEntry(1, u.address, u.port), u).build();
+        Runtime rt = Runtime.getRuntime();
+        Process proc = rt.exec("java main slave " + p + " 127.0.0.1 " + (3000+p) );
         figure_table.put(p, new NodeEntry(p, "127.0.0.1", 3000 + p));
+        System.out.println("Created node " + p);
     }
 
     // find p k
