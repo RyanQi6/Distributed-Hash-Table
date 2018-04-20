@@ -53,4 +53,8 @@ public class SlaveNodes extends Node{
     // show p
     @ Override
     public void show(){};
+
+    public static void main(String[] args){
+
+    }
 }
