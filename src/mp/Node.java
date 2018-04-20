@@ -1,23 +1,21 @@
+package mp;
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class Node {
-    int id;
-    FigureTable figure_table;
-    Node predecessor_pointer;
+public abstract class Node{
+    NodeEntry node_entry;
+    List<NodeEntry> figure_table;
+    NodeEntry predecessor_pointer;
     List<Integer> key_container;
 
+    public abstract void join();
 
+    public abstract void find(int k);
 
-    public abstract void join(Node p);
+    public abstract void crash();
 
-    public abstract void find(Node p, int k);
+    public abstract void show();
 
-    public abstract void crash(Node p);
-
-    public abstract void show(Node p);
-
-    public abstract void showAll();
 }
 
 
