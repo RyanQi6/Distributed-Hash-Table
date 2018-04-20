@@ -7,6 +7,7 @@ public abstract class Node{
     List<NodeEntry> figure_table;
     NodeEntry predecessor_pointer;
     List<Integer> key_container;
+    Unicast u;
 
     public abstract void join();
 

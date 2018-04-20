@@ -3,7 +3,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class SlaveNode extends Node {
-    Unicast u;
 
     public SlaveNode(NodeBuilder builder) {
         this.node_entry = builder.node_entry;
@@ -12,7 +11,7 @@ public class SlaveNode extends Node {
         this.key_container = builder.key_container;
     }
 
-    static class NodeBuilder {
+    public static class NodeBuilder {
         private final NodeEntry node_entry;
         private List<NodeEntry> figure_table;
         private NodeEntry predecessor_pointer;
@@ -44,7 +43,7 @@ public class SlaveNode extends Node {
 
     // find p k
     @ Override
-    public void find(int k) {};
+    public  void find(int k) {};
 
     // crash p
     @ Override
