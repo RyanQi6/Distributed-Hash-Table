@@ -2,8 +2,9 @@ package mp;
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class Node{
+public abstract class Node {
     NodeEntry node_entry;
+    NodeEntry client_info;
     List<NodeEntry> figure_table;
     NodeEntry predecessor_pointer;
     List<Integer> key_container;

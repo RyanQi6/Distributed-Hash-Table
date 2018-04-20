@@ -11,6 +11,34 @@ public class Client {
     public Client(Unicast u) {
         figure_table = new HashMap<>();
         this.u = u;
+        startListen();
+    }
+
+    private void startListen() {
+        Runnable listener = new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    listen();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        };
+
+        new Thread(listener).start();
+    }
+
+    private void listen() throws InterruptedException, IOException {
+        String message;
+        while(true) {
+            if ((message = u.unicast_receive()) != null) {
+                System.out.println(message);
+            }
+            Thread.sleep(1000);
+        }
     }
 
     // key board command
@@ -19,8 +47,8 @@ public class Client {
 
     // join
     public void join(int p) throws IOException {
-        Runtime rt = Runtime.getRuntime();
-        Process proc = rt.exec("java main slave " + p + " 127.0.0.1 " + (3000+p) );
+        ProcessBuilder pb = new ProcessBuilder("java", "-cp", "/Users/liuyi/Desktop/Distributed-Hash-Table/out/production/Distributed-Hash-Table", "main", "slave", Integer.toString(p), "127.0.0.1", Integer.toString(3000+p), Integer.toString(u.port));
+        Process pr = pb.start();
         figure_table.put(p, new NodeEntry(p, "127.0.0.1", 3000 + p));
         System.out.println("Created node " + p);
     }
@@ -32,8 +60,19 @@ public class Client {
     public void crash(int p) {}
 
     // show p
-    public void show(int p) {}
+    public void show(int p) throws IOException, InterruptedException {
+        NodeEntry p_info = figure_table.get(p);
+        if(p_info == null)
+            System.out.println(p + " does not exist!");
+        else {
+            u.unicast_send(p_info.address, p_info.port, "show your table");
+        }
+    }
 
     //show all
     public void showAll() {}
+
+    public Map<Integer, NodeEntry> getFigure_table() {
+        return figure_table;
+    }
 }

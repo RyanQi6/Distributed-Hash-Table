@@ -7,6 +7,7 @@ public class MasterNode extends Node {
     // builder pattern
     public MasterNode(NodeBuilder builder) throws IOException {
         this.node_entry = builder.node_entry;
+        this.client_info = builder.client_info;
         this.figure_table = builder.figure_table;
         this.predecessor_pointer = builder.predecessor_pointer;
         this.key_container = builder.key_container;
@@ -15,13 +16,15 @@ public class MasterNode extends Node {
 
     public static class NodeBuilder {
         private final NodeEntry node_entry;
+        private final NodeEntry client_info;
         private  List<NodeEntry> figure_table;
         private NodeEntry predecessor_pointer;
         private List<Integer> key_container;
         private final Unicast u;
 
-        public NodeBuilder(NodeEntry node_entry, Unicast u) {
+        public NodeBuilder(NodeEntry node_entry, NodeEntry client_info, Unicast u) {
             this.node_entry = node_entry;
+            this.client_info = client_info;
             this.u = u;
             this.figure_table = new ArrayList<NodeEntry>();
             this.key_container = new ArrayList<Integer>();
