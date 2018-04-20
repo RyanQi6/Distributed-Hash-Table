@@ -3,11 +3,11 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Node0 extends Node {
+public class MasterNode extends Node {
     // builder pattern
     Config hostInfo;
     Unicast u;
-    private Node0(NodeBuilder builder) throws IOException{
+    private MasterNode(NodeBuilder builder) throws IOException{
         hostInfo= Config.parseConfig("configFile");
         u = new Unicast(builder.node_entry.address, node_entry.port, hostInfo);
         this.node_entry = builder.node_entry;
@@ -37,8 +37,8 @@ public class Node0 extends Node {
             this.key_container = key_container;
             return this;
         }
-        public Node0 build() throws IOException{
-            return new Node0(this);
+        public MasterNode build() throws IOException{
+            return new MasterNode(this);
         }
     }
     // failure detector
@@ -67,6 +67,6 @@ public class Node0 extends Node {
         NodeEntry node_entry = new NodeEntry(0, "127.0.0.1", 3002);
         List<NodeEntry> figure_table = new ArrayList<>();
         figure_table.add(node_entry);
-        Node0 node0 = new NodeBuilder(node_entry).figureTable(figure_table).build();
+        MasterNode masterNode = new NodeBuilder(node_entry).figureTable(figure_table).build();
     }
 }

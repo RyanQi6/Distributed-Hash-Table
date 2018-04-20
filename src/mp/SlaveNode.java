@@ -1,8 +1,8 @@
 package mp;
 import java.util.List;
 
-public class SlaveNodes extends Node{
-    private SlaveNodes(NodeBuilder builder){
+public class SlaveNode extends Node{
+    private SlaveNode(NodeBuilder builder){
         this.node_entry = builder.node_entry;
         this.figure_table = builder.figure_table;
         this.predecessor_pointer = builder.predecessor_pointer;
@@ -30,8 +30,8 @@ public class SlaveNodes extends Node{
             this.key_container = key_container;
             return this;
         }
-        public SlaveNodes build(){
-            return new SlaveNodes(this);
+        public SlaveNode build(){
+            return new SlaveNode(this);
         }
     }
     // send heartbeat
