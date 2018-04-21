@@ -68,7 +68,7 @@ class synchronizedSend {
     public static synchronized void send(String senderAddress, int senderPort, Client c, Config hostInfo, String destAddress, int destPort, String message){
         try {
             c.startClient(destAddress, destPort);
-            c.sendMessage(senderAddress + "||" + senderPort + "||" + message);
+            c.sendMessage(senderAddress + "||" + senderPort + "||" + message + "||");
             c.closeClient();
         } catch (IOException | InterruptedException e) {
             e.printStackTrace();
