@@ -60,8 +60,19 @@ public class SlaveNode extends Node {
         String message;
         while(true) {
             if ((message = u.unicast_receive()) != null) {
-                System.out.println(message);
-                u.unicast_send(client_info.address, client_info.port, message);
+                String sender_ip = message.substring(0, Utility.nthIndexOf(message, "||", 1));
+                Integer sender_port = Integer.parseInt(message.substring(Utility.nthIndexOf(message, "||", 1) + 2, Utility.nthIndexOf(message, "||", 2)));
+                String command = message.substring(Utility.nthIndexOf(message, "||", 2) + 2, Utility.nthIndexOf(message, "||", 3));
+                message = message.substring(Utility.nthIndexOf(message, "||", 3) + 2);
+                if(command.equals("ShowFigureTable")) {
+                    String response = "ResponseFigureTable";
+                    response += "||" + node_entry.id;
+                    for(int i = 0; i < 8; ++i) {
+                        NodeEntry temp = figure_table.get(i);
+                        response += "||" + temp.id;
+                    }
+                    u.unicast_send(sender_ip, sender_port, response);
+                }
             }
             Thread.sleep(1000);
         }

@@ -36,7 +36,25 @@ public class Client {
         String message;
         while(true) {
             if ((message = u.unicast_receive()) != null) {
-                System.out.println(message);
+                String sender_ip = message.substring(0, Utility.nthIndexOf(message, "||", 1));
+                Integer sender_port = Integer.parseInt(message.substring(Utility.nthIndexOf(message, "||", 1) + 2, Utility.nthIndexOf(message, "||", 2)));
+
+                String command = message.substring(Utility.nthIndexOf(message, "||", 2) + 2, Utility.nthIndexOf(message, "||", 3));
+
+                if(command.equals("ResponseFigureTable")) {
+                    String output = "";
+                    int node_id = Integer.parseInt(message.substring(Utility.nthIndexOf(message, "||", 3) + 2, Utility.nthIndexOf(message, "||", 4)));
+                    output += node_id + "\n" + "FingerTable: ";
+                    for(int i = 0; i < 8; ++i) {
+                        String temp = message.substring(Utility.nthIndexOf(message, "||", 4+i) + 2, Utility.nthIndexOf(message, "||", 4+i+1));
+                        output += temp;
+                        if(i != 7)
+                            output += ", ";
+                    }
+                    output += "\n" + "Keys: ";
+                    System.out.println(output);
+                    show_all_lock = false;
+                }
             }
             Thread.sleep(1000);
         }
