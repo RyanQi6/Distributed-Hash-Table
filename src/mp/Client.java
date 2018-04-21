@@ -9,9 +9,12 @@ public class Client {
     Map<Integer, NodeEntry> figure_table;
     Unicast u;
 
+    volatile boolean show_all_lock;
+
     public Client(Unicast u) {
         figure_table = new HashMap<>();
         this.u = u;
+        show_all_lock = false;
         startListen();
     }
 
@@ -82,15 +85,23 @@ public class Client {
     // show p
     public void show(int p) throws IOException, InterruptedException {
         NodeEntry p_info = figure_table.get(p);
-        if(p_info == null)
+        if(p_info == null) {
             System.out.println(p + " does not exist!");
+            show_all_lock = false;
+        }
         else {
             u.unicast_send(p_info.address, p_info.port, "ShowFigureTable");
         }
     }
 
     //show all
-    public void showAll() {}
+    public void showAll() throws IOException, InterruptedException {
+        for(int i = 1; i < 4; ++i) {
+            while (show_all_lock) { }
+            show(i);
+            show_all_lock = true;
+        }
+    }
 
     public Map<Integer, NodeEntry> getFigure_table() {
         return figure_table;
