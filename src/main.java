@@ -38,6 +38,7 @@ public class main {
                     System.out.println(client.getFigure_table());
                 } else if(strings[0].equals("show") && strings.length == 2) {
                     if(strings[1].equals("all")) {
+                        client.showAll();
                     }
                     else
                         client.show(Integer.parseInt(strings[1]));
@@ -58,6 +59,15 @@ public class main {
             NodeEntry client_info = new NodeEntry(-1, address, client_port);
             Unicast u = new Unicast(address, node_port, Config.parseConfig("configFile"));
             SlaveNode n = new SlaveNode.NodeBuilder(new NodeEntry(id, address, node_port), client_info, u).build();
+
+            n.add_figure_table(0,new NodeEntry(12,"222.222.111.111", 9999));
+            n.add_figure_table(1,new NodeEntry(13,"222.222.111.121", 9989));
+            n.add_figure_table(2,new NodeEntry(14,"222.222.111.111", 9999));
+            n.add_figure_table(3,new NodeEntry(15,"222.222.111.121", 9989));
+            n.add_figure_table(4,new NodeEntry(16,"222.222.111.111", 9999));
+            n.add_figure_table(5,new NodeEntry(17,"222.222.111.121", 9989));
+            n.add_figure_table(6,new NodeEntry(18,"222.222.111.111", 9999));
+            n.add_figure_table(7,new NodeEntry(19,"222.222.111.121", 9989));
 
             //keep the program running
             while (true) {

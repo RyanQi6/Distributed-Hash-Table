@@ -11,6 +11,10 @@ public abstract class Node {
     List<Integer> key_container;
     Unicast u;
 
+    public void add_figure_table(int index, NodeEntry node_entry) {
+        figure_table.put(index, node_entry);
+    };
+
     public abstract void join();
 
     public abstract void find(int k);
