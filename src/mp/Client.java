@@ -85,7 +85,7 @@ public class Client {
         if(p_info == null)
             System.out.println(p + " does not exist!");
         else {
-            u.unicast_send(p_info.address, p_info.port, "show your table");
+            u.unicast_send(p_info.address, p_info.port, "ShowFigureTable");
         }
     }
 
