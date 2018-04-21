@@ -1,5 +1,6 @@
 package mp;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
@@ -47,7 +48,8 @@ public class Client {
 
     // join
     public void join(int p) throws IOException {
-        ProcessBuilder pb = new ProcessBuilder("java", "-cp", "/Users/liuyi/Desktop/Distributed-Hash-Table/out/production/Distributed-Hash-Table", "main", "slave", Integer.toString(p), "127.0.0.1", Integer.toString(3000+p), Integer.toString(u.port));
+        String currentPath = System.getProperty("user.dir");
+        ProcessBuilder pb = new ProcessBuilder("java", "-cp", currentPath, "main", "slave", Integer.toString(p), "127.0.0.1", Integer.toString(3000+p), Integer.toString(u.port));
         Process pr = pb.start();
         figure_table.put(p, new NodeEntry(p, "127.0.0.1", 3000 + p));
         System.out.println("Created node " + p);
