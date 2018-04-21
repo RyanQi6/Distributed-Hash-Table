@@ -1,7 +1,6 @@
 package mp;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 public class SlaveNode extends Node {
 
@@ -18,7 +17,7 @@ public class SlaveNode extends Node {
     public static class NodeBuilder {
         private final NodeEntry node_entry;
         private final NodeEntry client_info;
-        private List<NodeEntry> figure_table;
+        private Map<Integer, NodeEntry> figure_table;
         private NodeEntry predecessor_pointer;
         private List<Integer> key_container;
 
@@ -28,7 +27,7 @@ public class SlaveNode extends Node {
             this.node_entry = node_entry;
             this.client_info = client_info;
             this.u = u;
-            this.figure_table = new ArrayList<NodeEntry>();
+            this.figure_table = new HashMap<Integer, NodeEntry>();
             this.key_container = new ArrayList<Integer>();
         }
         public NodeBuilder predecessorPointer(NodeEntry predecessor_pointer){

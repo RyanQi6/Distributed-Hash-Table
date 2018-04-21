@@ -1,11 +1,12 @@
 package mp;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public abstract class Node {
     NodeEntry node_entry;
     NodeEntry client_info;
-    List<NodeEntry> figure_table;
+    Map<Integer, NodeEntry> figure_table;
     NodeEntry predecessor_pointer;
     List<Integer> key_container;
     Unicast u;
