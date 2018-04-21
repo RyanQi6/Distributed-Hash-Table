@@ -1,0 +1,16 @@
+universal message format from unicast layer:
+    when you use unicast layer to send:
+        msg
+    the receiver will get
+        sender IP||sender port||msg||
+
+message format we defined:
+    1.
+        client ask node p to show figure table
+            msg = "ShowFigureTable"
+        So, node p will receive:
+            "sender IP||sender port||ShowFingureTable||"
+        Node p should reply:
+            msg = "ResponseFigureTable||p's ID||id0||...||id7"
+        Client will receive:
+            "sender IP||sender port||ResponseFigureTable||p's ID||id0||...||id7||"
