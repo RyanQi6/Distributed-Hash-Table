@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 
 public class main {
+    //java main master/slave id address node_port client_port
     public static void main(String[] args) throws IOException, InterruptedException {
         if(args[0].equals("master") && args.length == 5) {
             //code for client and master node
