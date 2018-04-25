@@ -15,7 +15,7 @@ public abstract class Node{
 
     public abstract void join();
 
-    public abstract void find(int k);
+    public abstract void find(boolean p_visited, int k);
 
     public abstract void crash();
 
