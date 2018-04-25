@@ -2,3 +2,4 @@
 *.xml
 *.class
 *.iml
+out/production/Distributed-Hash-Table/configFile
