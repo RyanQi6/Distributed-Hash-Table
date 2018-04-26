@@ -14,3 +14,13 @@ message format we defined:
             msg = "ResponseMyself||p's ID||p's number of keys||id0||...||id7||key0||...||keyN-1"
         Client will receive:
             "sender IP||sender port||ResponseMyself||p's ID||p's number of keys||id0||...||id7||key0||...||keyN-1||"
+
+    2.
+        node q ask node p to find successor of id
+            msg = "AskFindSuccessor||id"
+        So, node p will receive:
+            "sender IP||sender port||AskFindSuccessor||id||"
+        Node p should reply:
+            msg = "ResponseAskFindSuccessor||successor's id||successor's address||successor's port"
+        Node q will receive:
+            "sender IP||sender port||ResponseAskFindSuccessor||successor's id||successor's addeess||successor's port||"

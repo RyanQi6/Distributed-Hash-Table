@@ -46,7 +46,7 @@ public class Unicast {
         new Thread(server).start();
     }
 
-    public void unicast_send(String destAddress, int destPort, String message) throws IOException, InterruptedException {
+    public void unicast_send(String destAddress, int destPort, String message) {
         int delay = (int) (hostInfo.minDelay + (hostInfo.maxDelay - hostInfo.minDelay) * Math.random());
         Timer t = new Timer();
         t.schedule(new TimerTask(){
@@ -69,6 +69,7 @@ class synchronizedSend {
         try {
             c.startClient(destAddress, destPort);
             c.sendMessage(senderAddress + "||" + senderPort + "||" + message + "||");
+            System.out.println("    Msg to: " + destAddress + ":" + destPort + "   Content: " + senderAddress +"||" + senderPort + "||" + message + "||");
             c.closeClient();
         } catch (IOException | InterruptedException e) {
             e.printStackTrace();
