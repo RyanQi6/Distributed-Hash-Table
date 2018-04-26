@@ -17,12 +17,17 @@ public class main {
 
             //create client
             Client client = new Client(new Unicast(address, client_port, Config.parseConfig("configFile")));
+            System.out.println("Client starts running!");
 
             //create master node
             NodeEntry node_entry = new NodeEntry(id, address, node_port);
             NodeEntry client_info = new NodeEntry(-1, address, client_port);
             Unicast u = new Unicast(address, node_port, Config.parseConfig("configFile"));
             MasterNode masterNode = new MasterNode.NodeBuilder(node_entry, client_info, u).build();
+            client.alterFigureTable(id, node_entry);
+            System.out.println("Master node starts running!");
+
+            masterNode.addTestData();
 
             //wait for and deal with commands
             BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
@@ -31,17 +36,25 @@ public class main {
                 String s = br.readLine();
                 String[] strings = s.split(" ");
                 if(s.equals("join")) {
-                    client.join(1);
+                    client.join(9);
+                    client.join(6);
+                    client.join(5);
+                    client.join(8);
+                    client.join(7);
+                    client.join(4);
                     client.join(2);
+                    client.join(1);
                     client.join(3);
                 } else if(s.equals("ft")) {
-                    System.out.println(client.getFigure_table());
+                    client.printFigureTable();
                 } else if(strings[0].equals("show") && strings.length == 2) {
                     if(strings[1].equals("all")) {
                         client.showAll();
                     }
                     else
                         client.show(Integer.parseInt(strings[1]));
+                } else if(s.equals("test")) {
+//                    client.u.unicast_send("127.0.0.1", 3000, "TESTINFO");
                 }
                 else
                     System.out.println("Invalid command.");
@@ -60,14 +73,7 @@ public class main {
             Unicast u = new Unicast(address, node_port, Config.parseConfig("configFile"));
             SlaveNode n = new SlaveNode.NodeBuilder(new NodeEntry(id, address, node_port), client_info, u).build();
 
-            n.add_figure_table(0,new NodeEntry(12,"222.222.111.111", 9999));
-            n.add_figure_table(1,new NodeEntry(13,"222.222.111.121", 9989));
-            n.add_figure_table(2,new NodeEntry(14,"222.222.111.111", 9999));
-            n.add_figure_table(3,new NodeEntry(15,"222.222.111.121", 9989));
-            n.add_figure_table(4,new NodeEntry(16,"222.222.111.111", 9999));
-            n.add_figure_table(5,new NodeEntry(17,"222.222.111.121", 9989));
-            n.add_figure_table(6,new NodeEntry(18,"222.222.111.111", 9999));
-            n.add_figure_table(7,new NodeEntry(19,"222.222.111.121", 9989));
+            n.addTestData();
 
             //keep the program running
             while (true) {
