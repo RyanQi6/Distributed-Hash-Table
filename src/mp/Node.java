@@ -7,13 +7,13 @@ import java.util.Map;
 public abstract class Node {
     NodeEntry self_info;
     NodeEntry client_info;
-    Map<Integer, NodeEntry> figure_table;
+    Map<Integer, NodeEntry> finger_table;
     NodeEntry predecessor_pointer;
     List<Integer> key_container;
     Unicast u;
 
-    public void alter_figure_table(int index, NodeEntry node_info) {
-        figure_table.put(index, node_info);
+    public void alter_finger_table(int index, NodeEntry node_info) {
+        finger_table.put(index, node_info);
     };
 
     public void add_key(int key) {
@@ -44,14 +44,14 @@ public abstract class Node {
     public abstract void crash();
 
     public void addTestData() {
-        alter_figure_table(0,new NodeEntry(self_info.id + 1,"222.222.111.111", 9999));
-        alter_figure_table(1,new NodeEntry(self_info.id + 2,"222.222.111.121", 9989));
-        alter_figure_table(2,new NodeEntry(self_info.id + 3,"222.222.111.111", 9999));
-        alter_figure_table(3,new NodeEntry(self_info.id + 4,"222.222.111.121", 9989));
-        alter_figure_table(4,new NodeEntry(self_info.id + 5,"222.222.111.111", 9999));
-        alter_figure_table(5,new NodeEntry(self_info.id + 6,"222.222.111.121", 9989));
-        alter_figure_table(6,new NodeEntry(self_info.id + 7,"222.222.111.111", 9999));
-        alter_figure_table(7,new NodeEntry(self_info.id + 8,"222.222.111.121", 9989));
+        alter_finger_table(0,new NodeEntry(self_info.id + 1,"222.222.111.111", 9999));
+        alter_finger_table(1,new NodeEntry(self_info.id + 2,"222.222.111.121", 9989));
+        alter_finger_table(2,new NodeEntry(self_info.id + 3,"222.222.111.111", 9999));
+        alter_finger_table(3,new NodeEntry(self_info.id + 4,"222.222.111.121", 9989));
+        alter_finger_table(4,new NodeEntry(self_info.id + 5,"222.222.111.111", 9999));
+        alter_finger_table(5,new NodeEntry(self_info.id + 6,"222.222.111.121", 9989));
+        alter_finger_table(6,new NodeEntry(self_info.id + 7,"222.222.111.111", 9999));
+        alter_finger_table(7,new NodeEntry(self_info.id + 8,"222.222.111.121", 9989));
 
         add_key(self_info.id + 1);
         add_key(self_info.id + 2);
@@ -85,12 +85,12 @@ public abstract class Node {
 
     //find successor of id
     public NodeEntry find_successor(int id) {
-        if(unwrap_id(figure_table.get(0).id)  > unwrap_id(id))
-            return figure_table.get(0);
+        if(unwrap_id(finger_table.get(0).id)  > unwrap_id(id))
+            return finger_table.get(0);
         else {
             for(int i = 0; i < 8; ++i) {
-                if(unwrap_id(figure_table.get(i).id) > unwrap_id(id))
-                    return ask_find_successor(figure_table.get(i-1), id);
+                if(unwrap_id(finger_table.get(i).id) > unwrap_id(id))
+                    return ask_find_successor(finger_table.get(i-1), id);
             }
         }
         //should not reach here

@@ -10,7 +10,7 @@ public class SlaveNode extends Node {
         this.self_info = builder.self_info;
         this.client_info = builder.client_info;
         this.master_info = builder.master_info;
-        this.figure_table = builder.figure_table;
+        this.finger_table = builder.finger_table;
         this.predecessor_pointer = builder.predecessor_pointer;
         this.key_container = builder.key_container;
         this.u = builder.u;
@@ -21,7 +21,7 @@ public class SlaveNode extends Node {
         private final NodeEntry self_info;
         private final NodeEntry client_info;
         private final NodeEntry master_info;
-        private Map<Integer, NodeEntry> figure_table;
+        private Map<Integer, NodeEntry> finger_table;
         private NodeEntry predecessor_pointer;
         private List<Integer> key_container;
 
@@ -32,7 +32,7 @@ public class SlaveNode extends Node {
             this.client_info = client_info;
             this.master_info = master_into;
             this.u = u;
-            this.figure_table = new HashMap<Integer, NodeEntry>();
+            this.finger_table = new HashMap<Integer, NodeEntry>();
             this.key_container = new ArrayList<Integer>();
         }
         public NodeBuilder predecessorPointer(NodeEntry predecessor_pointer){
@@ -56,7 +56,7 @@ public class SlaveNode extends Node {
                     String response = "ResponseMyself";
                     response += "||" + self_info.id + "||" + key_container.size();
                     for(int i = 0; i < 8; ++i)
-                        response += "||" + figure_table.get(i).id;
+                        response += "||" + finger_table.get(i).id;
                     Integer[] keys = key_container.toArray(new Integer[0]);
                     Arrays.sort(keys);
                     for(int i : keys)
@@ -94,14 +94,14 @@ public class SlaveNode extends Node {
     }
 
     public void init_fingure_table() {
-        figure_table.put(0, ask_find_successor(master_info, get_start(0)));
-        predecessor_pointer = ask_return_predecessor(figure_table.get(0));
-        ask_set_predecessor(figure_table.get(0), self_info);
+        finger_table.put(0, ask_find_successor(master_info, get_start(0)));
+        predecessor_pointer = ask_return_predecessor(finger_table.get(0));
+        ask_set_predecessor(finger_table.get(0), self_info);
         for(int i = 0; i <= 6; ++i) {
-            if(unwrap_id(get_start(i+1)) <= unwrap_id(figure_table.get(i).id))
-                figure_table.put(i+1, figure_table.get(i));
+            if(unwrap_id(get_start(i+1)) <= unwrap_id(finger_table.get(i).id))
+                finger_table.put(i+1, finger_table.get(i));
             else
-                figure_table.put(i+1, ask_find_successor(master_info, get_start(i+1)));
+                finger_table.put(i+1, ask_find_successor(master_info, get_start(i+1)));
         }
     }
 

@@ -24,7 +24,7 @@ public class main {
             NodeEntry client_info = new NodeEntry(-1, address, client_port);
             Unicast u = new Unicast(address, node_port, Config.parseConfig("configFile"));
             MasterNode masterNode = new MasterNode.NodeBuilder(node_entry, client_info, u).build();
-            client.alterFigureTable(0, node_entry);
+            client.alterFingerTable(0, node_entry);
             System.out.println("Master node starts running!");
 
             masterNode.addTestData();

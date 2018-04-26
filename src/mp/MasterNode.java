@@ -7,19 +7,19 @@ public class MasterNode extends Node {
     public MasterNode(NodeBuilder builder) throws IOException {
         this.self_info = builder.self_info;
         this.client_info = builder.client_info;
-        this.figure_table = builder.figure_table;
+        this.finger_table = builder.finger_table;
         this.predecessor_pointer = builder.predecessor_pointer;
         this.key_container = builder.key_container;
         this.u = builder.u;
         for(int i = 0; i < 8; ++i)
-            this.figure_table.put(i, self_info);
+            this.finger_table.put(i, self_info);
         startListen();
     }
 
     public static class NodeBuilder {
         private final NodeEntry self_info;
         private final NodeEntry client_info;
-        private Map<Integer, NodeEntry> figure_table;
+        private Map<Integer, NodeEntry> finger_table;
         private NodeEntry predecessor_pointer;
         private List<Integer> key_container;
         private final Unicast u;
@@ -28,7 +28,7 @@ public class MasterNode extends Node {
             this.self_info = self_info;
             this.client_info = client_info;
             this.u = u;
-            this.figure_table = new HashMap<Integer, NodeEntry>();
+            this.finger_table = new HashMap<Integer, NodeEntry>();
             this.key_container = new ArrayList<Integer>();
         }
         public NodeBuilder predecessorPointer(NodeEntry predecessor_pointer) {
@@ -52,7 +52,7 @@ public class MasterNode extends Node {
                     String response = "ResponseMyself";
                     response += "||" + self_info.id + "||" + key_container.size();
                     for(int i = 0; i < 8; ++i)
-                        response += "||" + figure_table.get(i).id;
+                        response += "||" + finger_table.get(i).id;
                     Integer[] keys = key_container.toArray(new Integer[0]);
                     Arrays.sort(keys);
                     for(int i : keys)
@@ -84,7 +84,7 @@ public class MasterNode extends Node {
 
     //communicate with client
 
-    //initalize figure table
+    //initalize finger table
 
 
     // find p k
