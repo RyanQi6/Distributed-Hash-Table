@@ -1,9 +1,6 @@
 package mp;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class MasterNode extends Node {
     // builder pattern
@@ -14,6 +11,7 @@ public class MasterNode extends Node {
         this.predecessor_pointer = builder.predecessor_pointer;
         this.key_container = builder.key_container;
         this.u = builder.u;
+        startListen();
     }
 
     public static class NodeBuilder {
@@ -39,6 +37,31 @@ public class MasterNode extends Node {
             return new MasterNode(this);
         }
     }
+
+    public void listen() throws InterruptedException, IOException {
+        String message;
+        while(true) {
+            if ((message = u.unicast_receive()) != null) {
+                String sender_ip = message.substring(0, Utility.nthIndexOf(message, "||", 1));
+                Integer sender_port = Integer.parseInt(message.substring(Utility.nthIndexOf(message, "||", 1) + 2, Utility.nthIndexOf(message, "||", 2)));
+                String command = message.substring(Utility.nthIndexOf(message, "||", 2) + 2, Utility.nthIndexOf(message, "||", 3));
+                message = message.substring(Utility.nthIndexOf(message, "||", 3) + 2);
+                if(command.equals("ShowYourself")) {
+                    String response = "ResponseMyself";
+                    response += "||" + node_entry.id + "||" + key_container.size();
+                    for(int i = 0; i < 8; ++i)
+                        response += "||" + figure_table.get(i).id;
+                    Integer[] keys = key_container.toArray(new Integer[0]);
+                    Arrays.sort(keys);
+                    for(int i : keys)
+                        response += "||" + i;
+                    u.unicast_send(sender_ip, sender_port, response);
+                }
+            }
+            Thread.sleep(100);
+        }
+    }
+
     // failure detector
 
     //communicate with client

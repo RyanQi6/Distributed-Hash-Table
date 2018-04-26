@@ -6,11 +6,11 @@ universal message format from unicast layer:
 
 message format we defined:
     1.
-        client ask node p to show figure table
-            msg = "ShowFigureTable"
+        client ask node p to show itself
+            msg = "ShowYourself"
         So, node p will receive:
-            "sender IP||sender port||ShowFingureTable||"
+            "sender IP||sender port||ShowYourself||"
         Node p should reply:
-            msg = "ResponseFigureTable||p's ID||id0||...||id7"
+            msg = "ResponseMyself||p's ID||p's number of keys||id0||...||id7||key0||...||keyN-1"
         Client will receive:
-            "sender IP||sender port||ResponseFigureTable||p's ID||id0||...||id7||"
+            "sender IP||sender port||ResponseMyself||p's ID||p's number of keys||id0||...||id7||key0||...||keyN-1||"

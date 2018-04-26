@@ -2,8 +2,7 @@ package mp;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 public class Client {
     Map<Integer, NodeEntry> figure_table;
@@ -16,6 +15,10 @@ public class Client {
         this.u = u;
         show_all_lock = false;
         startListen();
+    }
+
+    public void alterFigureTable(int id, NodeEntry info) {
+        figure_table.put(id, info);
     }
 
     private void startListen() {
@@ -44,22 +47,30 @@ public class Client {
 
                 String command = message.substring(Utility.nthIndexOf(message, "||", 2) + 2, Utility.nthIndexOf(message, "||", 3));
 
-                if(command.equals("ResponseFigureTable")) {
+                if(command.equals("ResponseMyself")) {
                     String output = "";
                     int node_id = Integer.parseInt(message.substring(Utility.nthIndexOf(message, "||", 3) + 2, Utility.nthIndexOf(message, "||", 4)));
+                    int numKeys = Integer.parseInt(message.substring(Utility.nthIndexOf(message, "||", 4) + 2, Utility.nthIndexOf(message, "||", 5)));
+
                     output += node_id + "\n" + "FingerTable: ";
                     for(int i = 0; i < 8; ++i) {
-                        String temp = message.substring(Utility.nthIndexOf(message, "||", 4+i) + 2, Utility.nthIndexOf(message, "||", 4+i+1));
+                        String temp = message.substring(Utility.nthIndexOf(message, "||", 5+i) + 2, Utility.nthIndexOf(message, "||", 5+i+1));
                         output += temp;
                         if(i != 7)
                             output += ", ";
                     }
+
                     output += "\n" + "Keys: ";
+                    for(int i = 0; i < numKeys; ++i) {
+                        String key = message.substring(Utility.nthIndexOf(message, "||", 13+i) + 2, Utility.nthIndexOf(message, "||", 13+i+1));
+                        output += key + " ";
+                    }
+
                     System.out.println(output);
                     show_all_lock = false;
                 }
             }
-            Thread.sleep(1000);
+            Thread.sleep(100);
         }
     }
 
@@ -90,20 +101,27 @@ public class Client {
             show_all_lock = false;
         }
         else {
-            u.unicast_send(p_info.address, p_info.port, "ShowFigureTable");
+            u.unicast_send(p_info.address, p_info.port, "ShowYourself");
         }
     }
 
     //show all
     public void showAll() throws IOException, InterruptedException {
-        for(int i = 1; i < 4; ++i) {
+        for(Integer i: getIdList()) {
             while (show_all_lock) { }
             show(i);
             show_all_lock = true;
         }
     }
 
-    public Map<Integer, NodeEntry> getFigure_table() {
-        return figure_table;
+    public void printFigureTable() {
+        System.out.println(figure_table);
+    }
+
+    protected Integer[] getIdList() {
+        Set<Integer> idSet = figure_table.keySet();
+        Integer[] idArray = idSet.toArray(new Integer[0]);
+        Arrays.sort(idArray);
+        return idArray;
     }
 }

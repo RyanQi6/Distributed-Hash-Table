@@ -39,24 +39,7 @@ public class SlaveNode extends Node {
         }
     }
 
-    private void startListen() {
-        Runnable listener = new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    listen();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
-        };
-
-        new Thread(listener).start();
-    }
-
-    private void listen() throws InterruptedException, IOException {
+    public void listen() throws InterruptedException, IOException {
         String message;
         while(true) {
             if ((message = u.unicast_receive()) != null) {
@@ -64,17 +47,19 @@ public class SlaveNode extends Node {
                 Integer sender_port = Integer.parseInt(message.substring(Utility.nthIndexOf(message, "||", 1) + 2, Utility.nthIndexOf(message, "||", 2)));
                 String command = message.substring(Utility.nthIndexOf(message, "||", 2) + 2, Utility.nthIndexOf(message, "||", 3));
                 message = message.substring(Utility.nthIndexOf(message, "||", 3) + 2);
-                if(command.equals("ShowFigureTable")) {
-                    String response = "ResponseFigureTable";
-                    response += "||" + node_entry.id;
-                    for(int i = 0; i < 8; ++i) {
-                        NodeEntry temp = figure_table.get(i);
-                        response += "||" + temp.id;
-                    }
+                if(command.equals("ShowYourself")) {
+                    String response = "ResponseMyself";
+                    response += "||" + node_entry.id + "||" + key_container.size();
+                    for(int i = 0; i < 8; ++i)
+                        response += "||" + figure_table.get(i).id;
+                    Integer[] keys = key_container.toArray(new Integer[0]);
+                    Arrays.sort(keys);
+                    for(int i : keys)
+                        response += "||" + i;
                     u.unicast_send(sender_ip, sender_port, response);
                 }
             }
-            Thread.sleep(1000);
+            Thread.sleep(100);
         }
     }
 
