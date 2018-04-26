@@ -4,9 +4,12 @@ import java.util.*;
 
 public class SlaveNode extends Node {
 
+    NodeEntry master_info;
+
     public SlaveNode(NodeBuilder builder) {
         this.node_entry = builder.node_entry;
         this.client_info = builder.client_info;
+        this.master_info = builder.master_info;
         this.figure_table = builder.figure_table;
         this.predecessor_pointer = builder.predecessor_pointer;
         this.key_container = builder.key_container;
@@ -17,15 +20,17 @@ public class SlaveNode extends Node {
     public static class NodeBuilder {
         private final NodeEntry node_entry;
         private final NodeEntry client_info;
+        private final NodeEntry master_info;
         private Map<Integer, NodeEntry> figure_table;
         private NodeEntry predecessor_pointer;
         private List<Integer> key_container;
 
         private final Unicast u;
 
-        public NodeBuilder(NodeEntry node_entry, NodeEntry client_info, Unicast u){
+        public NodeBuilder(NodeEntry node_entry, NodeEntry client_info, NodeEntry master_into, Unicast u){
             this.node_entry = node_entry;
             this.client_info = client_info;
+            this.master_info = master_into;
             this.u = u;
             this.figure_table = new HashMap<Integer, NodeEntry>();
             this.key_container = new ArrayList<Integer>();
