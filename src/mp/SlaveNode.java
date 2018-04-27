@@ -61,6 +61,7 @@ public class SlaveNode extends Node {
         finger_table.put(0, ask_find_successor(master_info, get_start(0)));
         predecessor_pointer = ask_return_predecessor(finger_table.get(0));
         ask_set_predecessor(finger_table.get(0), self_info);
+        ask_alter_finger_table(predecessor_pointer, 0, self_info);
         for(int i = 0; i <= 6; ++i) {
             if(unwrap_id(get_start(i+1)) <= unwrap_id(finger_table.get(i).id))
                 finger_table.put(i+1, finger_table.get(i));

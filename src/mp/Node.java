@@ -143,6 +143,19 @@ public abstract class Node {
                     ask_closest_preceding_finger_msg = message.substring(Utility.nthIndexOf(message, "||", 2) + 2, Utility.nthIndexOf(message, "||", 6));
                     ask_closest_preceding_finger_lock = false;
                 }
+                else if(command.equals("AskAlterFingerTable")) {
+                    int i = Integer.parseInt(message.substring(Utility.nthIndexOf(message, "||", 3) + 2, Utility.nthIndexOf(message, "||", 4)));
+                    int id = Integer.parseInt(message.substring(Utility.nthIndexOf(message, "||", 4) + 2, Utility.nthIndexOf(message, "||", 5)));
+                    String address = message.substring(Utility.nthIndexOf(message, "||", 5) + 2, Utility.nthIndexOf(message, "||", 6));
+                    int port = Integer.parseInt(message.substring(Utility.nthIndexOf(message, "||", 6) + 2, Utility.nthIndexOf(message, "||", 7)));;
+                    NodeEntry node_info = new NodeEntry(id, address, port);
+                    finger_table.put(i, node_info);
+                    String response = "ResponseAskAlterFingerTable";
+                    u.unicast_send(sender_ip, sender_port, response);
+                }
+                else if(command.equals("ResponseAskAlterFingerTable")) {
+                    ask_alter_finger_table_lock = false;
+                }
             }
             Thread.sleep(100);
         }
@@ -211,6 +224,7 @@ public abstract class Node {
     //find predecessor of id
     public NodeEntry find_predecessor(int id) {
         NodeEntry n_prime = self_info;
+//        System.out.println("find_predecessor:"+n_prime.id + " " + unwrap_id_for_other_node(id, n_prime.id) + " " + unwrap_id_for_other_node(ask_read_finger_table(n_prime, 0).id, n_prime.id));
         while(!(n_prime.id < unwrap_id_for_other_node(id, n_prime.id) && unwrap_id_for_other_node(id, n_prime.id) < unwrap_id_for_other_node(ask_read_finger_table(n_prime, 0).id, n_prime.id))) {
             n_prime = ask_closest_preceding_finger(n_prime, id);
         }
@@ -226,9 +240,9 @@ public abstract class Node {
         u.unicast_send(performer.address, performer.port, "AskClosestPrecedingFinger||" + id);
         while(ask_closest_preceding_finger_lock) {}
         //msg = "ResponseAskClosestPrecedingFinger||id||address||port"
-        int node_id = Integer.parseInt(ask_return_predecessor_msg.substring(Utility.nthIndexOf(ask_return_predecessor_msg, "||", 1) + 2, Utility.nthIndexOf(ask_return_predecessor_msg, "||", 2)));
-        String node_address = ask_return_predecessor_msg.substring(Utility.nthIndexOf(ask_return_predecessor_msg, "||", 2) + 2, Utility.nthIndexOf(ask_return_predecessor_msg, "||", 3));
-        int node_port = Integer.parseInt(ask_return_predecessor_msg.substring(Utility.nthIndexOf(ask_return_predecessor_msg, "||", 3) + 2));
+        int node_id = Integer.parseInt(ask_closest_preceding_finger_msg.substring(Utility.nthIndexOf(ask_closest_preceding_finger_msg, "||", 1) + 2, Utility.nthIndexOf(ask_closest_preceding_finger_msg, "||", 2)));
+        String node_address = ask_closest_preceding_finger_msg.substring(Utility.nthIndexOf(ask_closest_preceding_finger_msg, "||", 2) + 2, Utility.nthIndexOf(ask_closest_preceding_finger_msg, "||", 3));
+        int node_port = Integer.parseInt(ask_closest_preceding_finger_msg.substring(Utility.nthIndexOf(ask_closest_preceding_finger_msg, "||", 3) + 2));
         NodeEntry node_info = new NodeEntry(node_id, node_address, node_port);
         return node_info;
     }
@@ -283,13 +297,23 @@ public abstract class Node {
         ask_read_finger_table_lock = true;
         //msg = "AskReadFingerTable||index"
         u.unicast_send(performer.address, performer.port, "AskReadFingerTable||" + i);
-        while(ask_read_finger_table_lock) {}
+        while (ask_read_finger_table_lock) {
+        }
         //msg = "ResponseAskReadFingerTable||id||address||port"
-        int id = Integer.parseInt(ask_return_predecessor_msg.substring(Utility.nthIndexOf(ask_return_predecessor_msg, "||", 1) + 2, Utility.nthIndexOf(ask_return_predecessor_msg, "||", 2)));
-        String address = ask_return_predecessor_msg.substring(Utility.nthIndexOf(ask_return_predecessor_msg, "||", 2) + 2, Utility.nthIndexOf(ask_return_predecessor_msg, "||", 3));
-        int port = Integer.parseInt(ask_return_predecessor_msg.substring(Utility.nthIndexOf(ask_return_predecessor_msg, "||", 3) + 2));
+        int id = Integer.parseInt(ask_read_finger_table_msg.substring(Utility.nthIndexOf(ask_read_finger_table_msg, "||", 1) + 2, Utility.nthIndexOf(ask_read_finger_table_msg, "||", 2)));
+        String address = ask_read_finger_table_msg.substring(Utility.nthIndexOf(ask_read_finger_table_msg, "||", 2) + 2, Utility.nthIndexOf(ask_read_finger_table_msg, "||", 3));
+        int port = Integer.parseInt(ask_read_finger_table_msg.substring(Utility.nthIndexOf(ask_read_finger_table_msg, "||", 3) + 2));
         NodeEntry node_info = new NodeEntry(id, address, port);
         return node_info;
+    }
+
+    //ask node to return an entry of it's finger table
+    volatile boolean ask_alter_finger_table_lock;
+    public void ask_alter_finger_table(NodeEntry performer, int i, NodeEntry node_info) {
+        ask_alter_finger_table_lock = true;
+        //msg = "AskAlterFingerTable||i||id||address||port"
+        u.unicast_send(performer.address, performer.port, "AskAlterFingerTable||" + i + "||" + node_info.id + "||" + node_info.address + "||" + node_info.port);
+        while(ask_alter_finger_table_lock) {}
     }
 
     public void update_finger_table(NodeEntry node_info, int i) {

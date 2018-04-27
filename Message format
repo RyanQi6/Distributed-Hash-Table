@@ -74,3 +74,13 @@ message format we defined:
             msg = "ResponseAskClosestPrecedingFinger||id||address||port"
         Node q will receive:
             "sender IP||sender port||ResponseAskClosestPrecedingFinger||id||address||port||"
+
+    8.
+        node q ask node p to alter p's finger table
+            msg = "AskAlterFingerTable||i||id||address||port"
+        So, node p will receive:
+            "sender IP||sender port||AskAlterFingerTable||i||id||address||port"
+        Node p should reply:
+            msg = "ResponseAskAlterFingerTable"
+        Node q will receive:
+            "sender IP||sender port||ResponseAskAlterFingerTable||"
