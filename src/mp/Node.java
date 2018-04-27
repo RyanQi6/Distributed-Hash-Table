@@ -246,7 +246,7 @@ public abstract class Node {
     public NodeEntry find_predecessor(int id) {
         NodeEntry n_prime = self_info;
 //        System.out.println("find_predecessor:"+n_prime.id + " " + unwrap_id_for_other_node(id, n_prime.id) + " " + unwrap_id_for_other_node(ask_read_finger_table(n_prime, 0).id, n_prime.id));
-        while(!(n_prime.id < unwrap_id_for_other_node(id, n_prime.id) && unwrap_id_for_other_node(id, n_prime.id) < unwrap_id_for_other_node(ask_read_finger_table(n_prime, 0).id, n_prime.id))) {
+        while(!(n_prime.id < unwrap_id_for_other_node(id, n_prime.id) && unwrap_id_for_other_node(id, n_prime.id) <= unwrap_id_for_other_node(ask_read_finger_table(n_prime, 0).id, n_prime.id))) {
             n_prime = ask_closest_preceding_finger(n_prime, id);
         }
         return n_prime;
