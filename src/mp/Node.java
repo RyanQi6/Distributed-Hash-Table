@@ -188,7 +188,7 @@ public abstract class Node {
                     if(command_mode == 1){
 //                        receivedHeartbeat();
                     } else if(command_mode == 3){
-                        int k = Integer.parseInt(message.substring(thirdSplit + 2, message.length()-1));
+                        int k = Integer.parseInt(message.substring(thirdSplit + 2, message.length()-2));
                         find(k);
                     } else if(command_mode == 6) {
 //                        int fourthSplit = Utility.nthIndexOf(message, "||", 4);

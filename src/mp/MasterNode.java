@@ -47,13 +47,6 @@ public class MasterNode extends Node {
 
     //initalize finger table
 
-
-    // find p k
-    @ Override
-    public void find(int k) {
-
-    };
-
     // crash p
     @ Override
     public void crash() {};

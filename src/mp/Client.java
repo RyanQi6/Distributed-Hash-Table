@@ -87,7 +87,7 @@ public class Client {
                     int thirdSplit = Utility.nthIndexOf(message, "||", 3);
                     int fourthSplit = Utility.nthIndexOf(message,"||", 4);
                     int node_id = Integer.parseInt(message.substring(thirdSplit + 2, fourthSplit));
-                    int k = Integer.parseInt(message.substring(fourthSplit + 2, message.length()-1));
+                    int k = Integer.parseInt(message.substring(fourthSplit + 2, message.length()-2));
                     System.out.println("Key " + k + " is in node " + node_id);
                 }
             }

@@ -92,12 +92,6 @@ public class SlaveNode extends Node {
         return r < 0 ? r + b : r;
     }
 
-    // find p k
-    @ Override
-    public void find(int k) {
-
-    };
-
     // crash p
     @ Override
     public void crash() {};
