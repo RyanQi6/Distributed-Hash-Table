@@ -228,18 +228,8 @@ public abstract class Node {
 
     //find successor of id
     public NodeEntry find_successor(int id) {
-        //if even the nearest node is greater than id, then this node is the successor
-        if(unwrap_id(finger_table.get(0).id)  > unwrap_id(id))
-            return finger_table.get(0);
-        else {
-            //else, find the farthest node less than or equal to id and ask it to search for successor
-            for(int i = 0; i < 8; ++i) {
-                if(unwrap_id(finger_table.get(i).id) > unwrap_id(id))
-                    return ask_find_successor(finger_table.get(i-1), id);
-            }
-            //if even the farthest node is less than id, ask the farthest to search for successor
-            return ask_find_successor(finger_table.get(7), id);
-        }
+        NodeEntry predecessor = find_predecessor(id);
+        return ask_read_finger_table(predecessor, 0);
     }
 
     //find predecessor of id

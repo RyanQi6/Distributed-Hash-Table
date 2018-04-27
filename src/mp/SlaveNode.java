@@ -73,10 +73,16 @@ public class SlaveNode extends Node {
 
     public void update_others() {
         for(int i = 0; i < 8; ++i) {
-            System.out.println(mod((self_info.id - (int)Math.pow(2, i)), 256));
-            NodeEntry p = find_predecessor(mod((self_info.id - (int)Math.pow(2, i)), 256));
-            System.out.println("Predecessor: " + p.id);
-            ask_update_finger_table(p, self_info, i);
+            int possible_id_to_update = mod((self_info.id - (int)Math.pow(2, i)), 256);
+            System.out.println("Possible id to update: " + possible_id_to_update);
+            NodeEntry successor = find_successor(possible_id_to_update);
+            NodeEntry node_to_update;
+            if(successor.id == possible_id_to_update)
+                node_to_update = successor;
+            else
+                node_to_update = find_predecessor(possible_id_to_update);
+            System.out.println("Node preceding this id: " + node_to_update.id);
+            ask_update_finger_table(node_to_update, self_info, i);
         }
     }
 
