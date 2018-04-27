@@ -123,7 +123,9 @@ public class Client {
     }
 
     // crash p
-    public void crash(int p) {}
+    public void crash(int p) {
+        u.unicast_send(this.finger_table.get(p).address, this.finger_table.get(p).port, "7||" + p);
+    }
 
     // show p
     public void show(int p) throws IOException, InterruptedException {

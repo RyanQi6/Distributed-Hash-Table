@@ -7,6 +7,7 @@ public class SlaveNode extends Node {
     NodeEntry master_info;
 
     public SlaveNode(NodeBuilder builder) {
+        super();
         this.self_info = builder.self_info;
         this.client_info = builder.client_info;
         this.master_info = builder.master_info;

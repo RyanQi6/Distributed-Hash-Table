@@ -1,9 +1,6 @@
 package mp;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public abstract class Node {
     NodeEntry self_info;
@@ -12,6 +9,106 @@ public abstract class Node {
     NodeEntry predecessor_pointer;
     List<Integer> key_container;
     Unicast u;
+
+    public boolean successor_alive = true;
+    Timer send_timer;
+    Timer receive_timer;
+
+    public Node() {
+        sendHeartbeatTimer(5000);
+        receiveHeartbeatTimer(10000);
+    }
+
+    // Failure Detection
+    // Timer setter
+    public Timer sendHeartbeatTimer(int delay) {
+        this.send_timer = new Timer();
+        this.send_timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                destroySendTimer();
+                send_timer = sendHeartbeatTimer(delay);
+
+                u.unicast_send(predecessor_pointer.address, predecessor_pointer.port, "1||successor is alive");
+            }
+        }, delay);
+        return send_timer;
+    }
+
+    public Timer receiveHeartbeatTimer(int delay) {
+        this.receive_timer = new Timer();
+        this.receive_timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                destroyReceiveTimer();
+                receive_timer = receiveHeartbeatTimer(delay);
+
+                successor_alive = false;
+                u.unicast_send(client_info.address, client_info.port, "2||" + finger_table.get(0).id + "||node is down");
+
+                failureRecovery(finger_table.get(0).id);
+            }
+        }, delay);
+        return receive_timer;
+    }
+
+    // Timer destroyer
+    public void destroySendTimer(){
+        this.send_timer.cancel();
+    }
+    public void destroyReceiveTimer(){
+        this.receive_timer.cancel();
+    }
+
+    // When the heartbeat from successor is received, clear the timer, and time again
+    public void receivedHeartbeat(){
+        successor_alive = true;
+        destroyReceiveTimer();
+        this.receive_timer = receiveHeartbeatTimer(10000);
+    }
+
+    // Failure recovery: To be implemented
+    public void failureRecovery(int failed_node) {
+        if(failed_node <= predecessor_pointer.id + 128 && failed_node >= predecessor_pointer.id){
+            u.unicast_send(predecessor_pointer.address, predecessor_pointer.port, "6||"+ this.finger_table.get(0).id + "||node is down");
+        }
+        modify_finger_table(failed_node);
+    }
+
+    // Figure table modification after the node fails
+    // case 1: failed node is not in the figure table, do nothing
+    // case 2: failed node is on the last position of the figure table
+    // case 3: failed node is not on the last position
+    public void modify_finger_table(int failed_node){
+        // case 1
+        if(failed_node > this.self_info.id + 128 || failed_node < this.self_info.id){
+            return;
+        }
+        // case 2: find the successor, and replace the failed node entries with the successor of the failed node
+        if(this.finger_table.get(this.finger_table.size()-1).id == failed_node){
+            NodeEntry successor = find_successor(failed_node);
+            for(int i=0; i<this.finger_table.size(); ++i){
+                if(this.finger_table.get(i).id == failed_node){
+                    this.finger_table.put(i, successor);
+                }
+            }
+        }
+        // case 3: replace the failed node with the successor of the failed node
+        else {
+            //find the index of failed node's successor
+            int index = -1;
+            boolean lock = false;
+            for(int i=this.finger_table.size()-1; i>=0; --i){
+                if(this.finger_table.get(i).id == failed_node ){
+                    if(!lock){
+                        index = i+1;
+                        lock = true;
+                    }
+                    this.finger_table.put(i, this.finger_table.get(index));
+                }
+            }
+        }
+    }
 
     public void print_finger_table() {
         System.out.println(finger_table);
@@ -186,14 +283,14 @@ public abstract class Node {
 
                     // command mode switch
                     if(command_mode == 1){
-//                        receivedHeartbeat();
+                        receivedHeartbeat();
                     } else if(command_mode == 3){
                         int k = Integer.parseInt(message.substring(thirdSplit + 2, message.length()-2));
                         find(k);
                     } else if(command_mode == 6) {
-//                        int fourthSplit = Utility.nthIndexOf(message, "||", 4);
-//                        Integer failed_node = Integer.parseInt(message.substring(thirdSplit + 2, fourthSplit));
-//                        failureRecovery(failed_node);
+                        int fourthSplit = Utility.nthIndexOf(message, "||", 4);
+                        Integer failed_node = Integer.parseInt(message.substring(thirdSplit + 2, fourthSplit));
+                        failureRecovery(failed_node);
                     }
                 }
             }
