@@ -24,3 +24,53 @@ message format we defined:
             msg = "ResponseAskFindSuccessor||successor's id||successor's address||successor's port"
         Node q will receive:
             "sender IP||sender port||ResponseAskFindSuccessor||successor's id||successor's addeess||successor's port||"
+
+    3.
+        node q ask node p to return p's predecessor
+            msg = "AskReturnPredecessor"
+        So, node p will receive:
+            "sender IP||sender port||AskReturnPredecessor||"
+        Node p should reply:
+            msg = "ResponseAskReturnPredecessor||predecessor's id||predecessor's address||predecessor's port"
+        Node q will receive:
+            "sender IP||sender port||ResponseAskReturnPredecessor||predecessor's id||predecessor's address||predecessor's port||"
+
+    4.
+        node q ask node p to set p's predecessor
+            msg = "AskSetPredecessor||predecessor's id||predecessor's address||predecessor's port"
+        So, node p will receive:
+            "sender IP||sender port||AskSetPredecessor||predecessor's id||predecessor's address||predecessor's port||"
+        Node p should reply:
+            msg = "ResponseAskSetPredecessor"
+        Node q will receive:
+            "sender IP||sender port||ResponseAskSetPredecessor||"
+
+    5.
+        node q ask node p to update p's finger table (for node join process)
+            msg = "AskUpdateFingerTable||index||id||address||port"
+        So, node p will receive:
+            "sender IP||sender port||AskUpdateFingerTable||i||id||address||port||"
+        Node p should reply:
+            msg = "ResponseAskUpdateFingerTable"
+        Node q will receive:
+            "sender IP||sender port||ResponseAskUpdateFingerTable||"
+
+    6.
+        node q ask node p to return one of p's entry of finger table
+            msg = "AskReadFingerTable||index"
+        So, node p will receive:
+            "sender IP||sender port||AskReadFingerTable||index||"
+        Node p should reply:
+            msg = "ResponseAskReadFingerTable||id||address||port"
+        Node q will receive:
+            "sender IP||sender port||ResponseAskReadFingerTable||id||address||port||"
+
+    7.
+        node q ask node p to return p's closest preceding finger for id
+            msg = "AskClosestPrecedingFinger||id"
+        So, node p will receive:
+            "sender IP||sender port||AskClosestPrecedingFinger||id||"
+        Node p should reply:
+            msg = "ResponseAskClosestPrecedingFinger||id||address||port"
+        Node q will receive:
+            "sender IP||sender port||ResponseAskClosestPrecedingFinger||id||address||port||"

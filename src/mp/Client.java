@@ -81,9 +81,9 @@ public class Client {
 
     // join
     public void join(int p) throws IOException {
-//        String currentPath = System.getProperty("user.dir");
-//        ProcessBuilder pb = new ProcessBuilder("java", "-cp", currentPath, "main", "slave", Integer.toString(p), "127.0.0.1", Integer.toString(finger_table.get(0).port+p), Integer.toString(u.port), Integer.toString(finger_table.get(0).port));
-//        Process pr = pb.start();
+        String currentPath = System.getProperty("user.dir");
+        ProcessBuilder pb = new ProcessBuilder("java", "-cp", currentPath, "main", "slave", Integer.toString(p), "127.0.0.1", Integer.toString(finger_table.get(0).port+p), Integer.toString(u.port), Integer.toString(finger_table.get(0).port));
+        Process pr = pb.start();
         finger_table.put(p, new NodeEntry(p, "127.0.0.1", 3000 + p));
         System.out.println("Created node " + p);
     }

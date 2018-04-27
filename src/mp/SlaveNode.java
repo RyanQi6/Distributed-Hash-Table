@@ -15,6 +15,7 @@ public class SlaveNode extends Node {
         this.key_container = builder.key_container;
         this.u = builder.u;
         startListen();
+        join();
     }
 
     public static class NodeBuilder {
@@ -44,45 +45,7 @@ public class SlaveNode extends Node {
         }
     }
 
-    public void listen() throws InterruptedException, IOException {
-        String message;
-        while(true) {
-            if ((message = u.unicast_receive()) != null) {
-                System.out.println("    Msg received: " + message);
-                String sender_ip = message.substring(0, Utility.nthIndexOf(message, "||", 1));
-                Integer sender_port = Integer.parseInt(message.substring(Utility.nthIndexOf(message, "||", 1) + 2, Utility.nthIndexOf(message, "||", 2)));
-                String command = message.substring(Utility.nthIndexOf(message, "||", 2) + 2, Utility.nthIndexOf(message, "||", 3));
-                if(command.equals("ShowYourself")) {
-                    String response = "ResponseMyself";
-                    response += "||" + self_info.id + "||" + key_container.size();
-                    for(int i = 0; i < 8; ++i)
-                        response += "||" + finger_table.get(i).id;
-                    Integer[] keys = key_container.toArray(new Integer[0]);
-                    Arrays.sort(keys);
-                    for(int i : keys)
-                        response += "||" + i;
-                    u.unicast_send(sender_ip, sender_port, response);
-                }
-                else if(command.equals("AskFindSuccessor")) {
-                    int id =Integer.parseInt(message.substring(Utility.nthIndexOf(message, "||", 3) + 2, Utility.nthIndexOf(message, "||", 4)));
-                    //start a new thread to deal with the request to avoid blocking the listen function
-                    Runnable listener = new Runnable() {
-                        @Override
-                        public void run() {
-                            deal_with_be_AskedFindSuccessor(sender_ip, sender_port, id);
-                        }
-                    };
 
-                    new Thread(listener).start();
-                }
-                else if(command.equals("ResponseAskFindSuccessor")) {
-                    ask_find_successor_msg = message.substring(Utility.nthIndexOf(message, "||", 2) + 2, Utility.nthIndexOf(message, "||", 6));
-                    ask_find_successor_lock = false;
-                }
-            }
-            Thread.sleep(100);
-        }
-    }
 
     // send heartbeat
 
@@ -90,7 +53,8 @@ public class SlaveNode extends Node {
 
     // join itself to the network
     public void join() {
-
+        init_fingure_table();
+        update_others();
     }
 
     public void init_fingure_table() {
@@ -103,6 +67,21 @@ public class SlaveNode extends Node {
             else
                 finger_table.put(i+1, ask_find_successor(master_info, get_start(i+1)));
         }
+    }
+
+    public void update_others() {
+        for(int i = 0; i < 8; ++i) {
+            System.out.println(mod((self_info.id - (int)Math.pow(2, i)), 256));
+            NodeEntry p = find_predecessor(mod((self_info.id - (int)Math.pow(2, i)), 256));
+            System.out.println("Predecessor: " + p.id);
+            ask_update_finger_table(p, self_info, i);
+        }
+    }
+
+    public int mod(int a, int b)
+    {
+        int r = a % b;
+        return r < 0 ? r + b : r;
     }
 
     // find p k
