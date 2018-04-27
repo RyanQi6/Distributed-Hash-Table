@@ -73,6 +73,22 @@ public class Client {
                     System.out.println("*************************************************************");
                     System.out.println("=============================================================");
                     show_all_lock = false;
+                } else if(command.equals("2")){
+                    int thirdSplit = Utility.nthIndexOf(message, "||", 3);
+                    int fourthSplit = Utility.nthIndexOf(message,"||", 4);
+                    Integer failed_node = Integer.parseInt(message.substring(thirdSplit + 2, fourthSplit));
+                    System.out.println("Node " + failed_node + " is down!");
+                } else if(command.equals("5")){
+                    int thirdSplit = Utility.nthIndexOf(message, "||", 3);
+                    int fourthSplit = Utility.nthIndexOf(message,"||", 4);
+                    int k = Integer.parseInt(message.substring(thirdSplit + 2, fourthSplit));
+                    System.out.println("Key " + k + " is not found");
+                } else if(command.equals("4")){
+                    int thirdSplit = Utility.nthIndexOf(message, "||", 3);
+                    int fourthSplit = Utility.nthIndexOf(message,"||", 4);
+                    int node_id = Integer.parseInt(message.substring(thirdSplit + 2, fourthSplit));
+                    int k = Integer.parseInt(message.substring(fourthSplit + 2, message.length()-1));
+                    System.out.println("Key " + k + " is in node " + node_id);
                 }
             }
             Thread.sleep(100);
@@ -98,7 +114,13 @@ public class Client {
     }
 
     // find p k
-    public void find(int p, int k) {}
+    public void find(int p, int k) {
+        if(k < 0 || k > 255){
+            System.out.println("The key does not exit");
+            return;
+        }
+        u.unicast_send(this.finger_table.get(p).address, this.finger_table.get(p).port, "3||" + k);
+    }
 
     // crash p
     public void crash(int p) {}

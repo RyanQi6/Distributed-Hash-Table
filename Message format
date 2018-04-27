@@ -94,3 +94,14 @@ message format we defined:
             msg = "ResponseAskTransferKey||number of keys||first key||second key||...||last key"
         Node q will receive:
             "sender IP||sender port||ResponseAskTransferKey||number of keys||first key||second key||...||last key||"
+
+From HaoRan:
+
+    message types used:
+    1. heartbeat message, from successor to predecessor ---------- ip||port||1||successor is alive
+    2. node crash report, from predecessor to client --------ip||port||2||failed_node_id||node is down
+    3. find(k) initial, from client to node --------ip||port||3||k
+    4. find response, from a node to client, the key exits -------ip||port||4||the node id containing the key||k
+    5. find response, from a node to client, the key not exits --------------ip||port||5||k||key k is not found
+    6. failure recovery, from a node to its predecessor ------------ip||port||6||failed_node_id||node is down
+    7. crash a node, from client to the node to be crashed ---------------ip||port||7||crash_node

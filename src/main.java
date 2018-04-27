@@ -65,6 +65,10 @@ public class main {
                     masterNode.alter_finger_table(5, new NodeEntry(50, "127.0.0.1", 3050));
                     masterNode.alter_finger_table(6, new NodeEntry(120, "127.0.0.1", 3120));
                     masterNode.alter_finger_table(7, new NodeEntry(200, "127.0.0.1", 3200));
+                } else if(strings[0].equals("find") && strings.length == 3) {
+                    int p = Integer.parseInt(strings[1]);
+                    int k = Integer.parseInt(strings[2]);
+                    client.find(p, k);
                 }
                 else
                     System.out.println("Invalid command.");
