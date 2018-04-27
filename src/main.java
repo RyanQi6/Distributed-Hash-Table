@@ -27,15 +27,15 @@ public class main {
             client.alterFingerTable(0, node_entry);
             System.out.println("Master node starts running!");
 
-            masterNode.addTestData();
-
             //wait for and deal with commands
             BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 
             while (true) {
                 String s = br.readLine();
                 String[] strings = s.split(" ");
-                if(s.equals("join")) {
+                if(strings[0].equals("join") && strings.length == 2) {
+                    client.join(Integer.parseInt(strings[1]));
+                } else if(s.equals("jointest")) {
                     client.join(9);
                     client.join(6);
                     client.join(5);
@@ -46,7 +46,7 @@ public class main {
                     client.join(1);
                     client.join(3);
                 } else if(s.equals("ft")) {
-                    client.printFigureTable();
+                    client.printFingerTable();
                 } else if(strings[0].equals("show") && strings.length == 2) {
                     if(strings[1].equals("all")) {
                         client.showAll();
@@ -54,7 +54,15 @@ public class main {
                     else
                         client.show(Integer.parseInt(strings[1]));
                 } else if(s.equals("test")) {
-//                    client.u.unicast_send("127.0.0.1", 3000, "TESTINFO");
+                    masterNode.set_predecessor(new NodeEntry(200, "127.0.0.1", 3200));
+                    masterNode.alter_finger_table(0, new NodeEntry(50, "127.0.0.1", 3050));
+                    masterNode.alter_finger_table(1, new NodeEntry(50, "127.0.0.1", 3050));
+                    masterNode.alter_finger_table(2, new NodeEntry(50, "127.0.0.1", 3050));
+                    masterNode.alter_finger_table(3, new NodeEntry(50, "127.0.0.1", 3050));
+                    masterNode.alter_finger_table(4, new NodeEntry(50, "127.0.0.1", 3050));
+                    masterNode.alter_finger_table(5, new NodeEntry(50, "127.0.0.1", 3050));
+                    masterNode.alter_finger_table(6, new NodeEntry(120, "127.0.0.1", 3120));
+                    masterNode.alter_finger_table(7, new NodeEntry(200, "127.0.0.1", 3200));
                 }
                 else
                     System.out.println("Invalid command.");
@@ -75,10 +83,50 @@ public class main {
             Unicast u = new Unicast(address, node_port, Config.parseConfig("configFile"));
             SlaveNode n = new SlaveNode.NodeBuilder(new NodeEntry(id, address, node_port), client_info, master_info, u).build();
 
-            n.addTestData();
+            //wait for and deal with commands
+            BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 
             //keep the program running
             while (true) {
+                String s = br.readLine();
+                String[] strings = s.split(" ");
+                if(strings[0].equals("jtest")) {
+                    n.join();
+                } else if(strings[0].equals("atd")) {
+                    n.addTestData();
+                } else if(s.equals("test50")) {
+                    n.set_predecessor(new NodeEntry(0, "127.0.0.1", 3000));
+                    n.alter_finger_table(0, new NodeEntry(120, "127.0.0.1", 3120));
+                    n.alter_finger_table(1, new NodeEntry(120, "127.0.0.1", 3120));
+                    n.alter_finger_table(2, new NodeEntry(120, "127.0.0.1", 3120));
+                    n.alter_finger_table(3, new NodeEntry(120, "127.0.0.1", 3120));
+                    n.alter_finger_table(4, new NodeEntry(120, "127.0.0.1", 3120));
+                    n.alter_finger_table(5, new NodeEntry(120, "127.0.0.1", 3120));
+                    n.alter_finger_table(6, new NodeEntry(120, "127.0.0.1", 3120));
+                    n.alter_finger_table(7, new NodeEntry(200, "127.0.0.1", 3200));
+                }else if(s.equals("test120")) {
+                    n.set_predecessor(new NodeEntry(50, "127.0.0.1", 3050));
+                    n.alter_finger_table(0, new NodeEntry(200, "127.0.0.1", 3200));
+                    n.alter_finger_table(1, new NodeEntry(200, "127.0.0.1", 3200));
+                    n.alter_finger_table(2, new NodeEntry(200, "127.0.0.1", 3200));
+                    n.alter_finger_table(3, new NodeEntry(200, "127.0.0.1", 3200));
+                    n.alter_finger_table(4, new NodeEntry(200, "127.0.0.1", 3200));
+                    n.alter_finger_table(5, new NodeEntry(200, "127.0.0.1", 3200));
+                    n.alter_finger_table(6, new NodeEntry(200, "127.0.0.1", 3200));
+                    n.alter_finger_table(7, new NodeEntry(0, "127.0.0.1", 3000));
+                }else if(s.equals("test200")) {
+                    n.set_predecessor(new NodeEntry(120, "127.0.0.1", 3120));
+                    n.alter_finger_table(0, new NodeEntry(0, "127.0.0.1", 3000));
+                    n.alter_finger_table(1, new NodeEntry(0, "127.0.0.1", 3000));
+                    n.alter_finger_table(2, new NodeEntry(0, "127.0.0.1", 3000));
+                    n.alter_finger_table(3, new NodeEntry(0, "127.0.0.1", 3000));
+                    n.alter_finger_table(4, new NodeEntry(0, "127.0.0.1", 3000));
+                    n.alter_finger_table(5, new NodeEntry(0, "127.0.0.1", 3000));
+                    n.alter_finger_table(6, new NodeEntry(50, "127.0.0.1", 3050));
+                    n.alter_finger_table(7, new NodeEntry(120, "127.0.0.1", 3120));
+                }
+                else
+                    System.out.println("Invalid command.");
                 Thread.sleep(1000);
             }
 
