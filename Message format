@@ -84,3 +84,13 @@ message format we defined:
             msg = "ResponseAskAlterFingerTable"
         Node q will receive:
             "sender IP||sender port||ResponseAskAlterFingerTable||"
+
+    9.
+        node q ask node p to transfer some of p's keys to q
+            msg = "AskTransferKey||minimal key number (exclusive)||maximum key number (inclusive)"
+        So, node p will receive:
+            "sender IP||sender port||AskTransferKey||minimal key number (exclusive)||maximum key number (inclusive)||"
+        Node p should reply:
+            msg = "ResponseAskTransferKey||number of keys||first key||second key||...||last key"
+        Node q will receive:
+            "sender IP||sender port||ResponseAskTransferKey||number of keys||first key||second key||...||last key||"

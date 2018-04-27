@@ -14,6 +14,10 @@ public class MasterNode extends Node {
         for(int i = 0; i < 8; ++i)
             this.finger_table.put(i, self_info);
         predecessor_pointer = self_info;
+        //initially put all keys in master node
+        for(int i = 0; i < 256; ++i) {
+            this.key_container.add(i);
+        }
         startListen();
     }
 

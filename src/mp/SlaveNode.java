@@ -55,6 +55,7 @@ public class SlaveNode extends Node {
     public void join() {
         init_fingure_table();
         update_others();
+        ask_transfer_keys(finger_table.get(0), predecessor_pointer.id, self_info.id);
     }
 
     public void init_fingure_table() {

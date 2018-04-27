@@ -156,6 +156,27 @@ public abstract class Node {
                 else if(command.equals("ResponseAskAlterFingerTable")) {
                     ask_alter_finger_table_lock = false;
                 }
+                else if(command.equals("AskTransferKey")) {
+                    int minimal = Integer.parseInt(message.substring(Utility.nthIndexOf(message, "||", 3) + 2, Utility.nthIndexOf(message, "||", 4)));
+                    int maximum = Integer.parseInt(message.substring(Utility.nthIndexOf(message, "||", 4) + 2, Utility.nthIndexOf(message, "||", 5)));
+                    String response = "ResponseAskTransferKey||";
+                    String key_list = "";
+                    int num_of_keys = 0;
+                    for(int i = 0; i < key_container.size(); ++i) {
+                        if(minimal < key_container.get(i) && key_container.get(i) <= maximum) {
+                            num_of_keys++;
+                            key_list += "||" + key_container.get(i);
+                            key_container.remove(i);
+                            i--;
+                        }
+                    }
+                    response += num_of_keys + key_list;
+                    u.unicast_send(sender_ip, sender_port, response);
+                }
+                else if(command.equals("ResponseAskTransferKey")) {
+                    ask_transfer_keys_msg = message.substring(Utility.nthIndexOf(message, "||", 2) + 2);
+                    ask_transfer_keys_lock = false;
+                }
             }
             Thread.sleep(100);
         }
@@ -327,6 +348,24 @@ public abstract class Node {
         update_finger_table(node_info, i);
         String response = "ResponseAskUpdateFingerTable";
         u.unicast_send(sender_ip, sender_port, response);
+    }
+
+    //ask node to transfer some of its keys to caller
+    volatile String ask_transfer_keys_msg;
+    volatile boolean ask_transfer_keys_lock;
+    public void ask_transfer_keys(NodeEntry performer, int minimal, int maximal) {
+        ask_transfer_keys_lock = true;
+        //msg = "AskTransferKey||minimal key number (exclusive)||maximum key number (inclusive)"
+        u.unicast_send(performer.address, performer.port, "AskTransferKey||" + minimal + "||" + maximal);
+        while (ask_transfer_keys_lock) {
+        }
+        //msg = "ResponseAskTransferKey||number of keys||first key||second key||...||last key||"
+        //notice that this msg is slightly different from others that there is "||" in the end
+        int num_of_keys =  Integer.parseInt(ask_transfer_keys_msg.substring(Utility.nthIndexOf(ask_transfer_keys_msg, "||", 1) + 2, Utility.nthIndexOf(ask_transfer_keys_msg, "||", 2)));
+        for(int i = 0; i < num_of_keys; ++i) {
+            int key = Integer.parseInt(ask_transfer_keys_msg.substring(Utility.nthIndexOf(ask_transfer_keys_msg, "||", 2 + i) + 2, Utility.nthIndexOf(ask_transfer_keys_msg, "||", 2 + i + 1)));
+            key_container.add(key);
+        }
     }
 
     public int get_start(int i) {
