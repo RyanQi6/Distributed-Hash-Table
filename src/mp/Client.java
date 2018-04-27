@@ -92,6 +92,11 @@ public class Client {
         System.out.println("Created node " + p);
     }
 
+    public void jtest(int p) throws IOException {
+        finger_table.put(p, new NodeEntry(p, "127.0.0.1", 3000 + p));
+        System.out.println("Created node " + p);
+    }
+
     // find p k
     public void find(int p, int k) {}
 

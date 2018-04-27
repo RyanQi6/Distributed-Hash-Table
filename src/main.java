@@ -35,6 +35,8 @@ public class main {
                 String[] strings = s.split(" ");
                 if(strings[0].equals("join") && strings.length == 2) {
                     client.join(Integer.parseInt(strings[1]));
+                } else if(strings[0].equals("jtest") && strings.length == 2) {
+                    client.jtest(Integer.parseInt(strings[1]));
                 } else if(s.equals("jointest")) {
                     client.join(9);
                     client.join(6);
