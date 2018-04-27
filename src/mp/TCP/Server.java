@@ -74,7 +74,7 @@ public class Server {
     //read from the socket channel and save to the buffer of Unicast layer
     private void read(SelectionKey key, Queue<String> messageBuffer) throws IOException {
         SocketChannel channel = (SocketChannel) key.channel();
-        ByteBuffer buffer = ByteBuffer.allocate(1024);
+        ByteBuffer buffer = ByteBuffer.allocate(2028);
         int numRead = -1;
         numRead = channel.read(buffer);
 

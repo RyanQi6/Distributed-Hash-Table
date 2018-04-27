@@ -1,0 +1,96 @@
+universal message format from unicast layer:
+    when you use unicast layer to send:
+        msg
+    the receiver will get
+        sender IP||sender port||msg||
+
+message format we defined:
+    1.
+        client ask node p to show itself
+            msg = "ShowYourself"
+        So, node p will receive:
+            "sender IP||sender port||ShowYourself||"
+        Node p should reply:
+            msg = "ResponseMyself||p's ID||p's number of keys||id0||...||id7||key0||...||keyN-1"
+        Client will receive:
+            "sender IP||sender port||ResponseMyself||p's ID||p's number of keys||id0||...||id7||key0||...||keyN-1||"
+
+    2.
+        node q ask node p to find successor of id
+            msg = "AskFindSuccessor||id"
+        So, node p will receive:
+            "sender IP||sender port||AskFindSuccessor||id||"
+        Node p should reply:
+            msg = "ResponseAskFindSuccessor||successor's id||successor's address||successor's port"
+        Node q will receive:
+            "sender IP||sender port||ResponseAskFindSuccessor||successor's id||successor's addeess||successor's port||"
+
+    3.
+        node q ask node p to return p's predecessor
+            msg = "AskReturnPredecessor"
+        So, node p will receive:
+            "sender IP||sender port||AskReturnPredecessor||"
+        Node p should reply:
+            msg = "ResponseAskReturnPredecessor||predecessor's id||predecessor's address||predecessor's port"
+        Node q will receive:
+            "sender IP||sender port||ResponseAskReturnPredecessor||predecessor's id||predecessor's address||predecessor's port||"
+
+    4.
+        node q ask node p to set p's predecessor
+            msg = "AskSetPredecessor||predecessor's id||predecessor's address||predecessor's port"
+        So, node p will receive:
+            "sender IP||sender port||AskSetPredecessor||predecessor's id||predecessor's address||predecessor's port||"
+        Node p should reply:
+            msg = "ResponseAskSetPredecessor"
+        Node q will receive:
+            "sender IP||sender port||ResponseAskSetPredecessor||"
+
+    5.
+        node q ask node p to update p's finger table (for node join process)
+            msg = "AskUpdateFingerTable||index||id||address||port"
+        So, node p will receive:
+            "sender IP||sender port||AskUpdateFingerTable||i||id||address||port||"
+        Node p should reply:
+            msg = "ResponseAskUpdateFingerTable"
+        Node q will receive:
+            "sender IP||sender port||ResponseAskUpdateFingerTable||"
+
+    6.
+        node q ask node p to return one of p's entry of finger table
+            msg = "AskReadFingerTable||index"
+        So, node p will receive:
+            "sender IP||sender port||AskReadFingerTable||index||"
+        Node p should reply:
+            msg = "ResponseAskReadFingerTable||id||address||port"
+        Node q will receive:
+            "sender IP||sender port||ResponseAskReadFingerTable||id||address||port||"
+
+    7.
+        node q ask node p to return p's closest preceding finger for id
+            msg = "AskClosestPrecedingFinger||id"
+        So, node p will receive:
+            "sender IP||sender port||AskClosestPrecedingFinger||id||"
+        Node p should reply:
+            msg = "ResponseAskClosestPrecedingFinger||id||address||port"
+        Node q will receive:
+            "sender IP||sender port||ResponseAskClosestPrecedingFinger||id||address||port||"
+
+    8.
+        node q ask node p to alter p's finger table
+            msg = "AskAlterFingerTable||i||id||address||port"
+        So, node p will receive:
+            "sender IP||sender port||AskAlterFingerTable||i||id||address||port"
+        Node p should reply:
+            msg = "ResponseAskAlterFingerTable"
+        Node q will receive:
+            "sender IP||sender port||ResponseAskAlterFingerTable||"
+
+    9.
+        node q ask node p to transfer some of p's keys to q
+            msg = "AskTransferKey||minimal key number (exclusive)||maximum key number (inclusive)"
+        So, node p will receive:
+            "sender IP||sender port||AskTransferKey||minimal key number (exclusive)||maximum key number (inclusive)||"
+        Node p should reply:
+            msg = "ResponseAskTransferKey||number of keys||first key||second key||...||last key"
+        Node q will receive:
+            "sender IP||sender port||ResponseAskTransferKey||number of keys||first key||second key||...||last key||"
