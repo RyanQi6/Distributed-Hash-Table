@@ -1,3 +1,5 @@
+ps -ef | grep 'java' | grep -v grep | awk '{print $2}' | xargs kill -9
+
 universal message format from unicast layer:
     when you use unicast layer to send:
         msg
