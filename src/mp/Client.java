@@ -82,7 +82,7 @@ public class Client {
                     int thirdSplit = Utility.nthIndexOf(message, "||", 3);
                     int fourthSplit = Utility.nthIndexOf(message,"||", 4);
                     int k = Integer.parseInt(message.substring(thirdSplit + 2, fourthSplit));
-                    System.out.println("Key " + k + " is not found");
+                    System.out.println("Key " + k + " not found.");
                 } else if(command.equals("4")){
                     int thirdSplit = Utility.nthIndexOf(message, "||", 3);
                     int fourthSplit = Utility.nthIndexOf(message,"||", 4);
@@ -115,11 +115,10 @@ public class Client {
 
     // find p k
     public void find(int p, int k) {
-        if(k < 0 || k > 255){
-            System.out.println("The key does not exit");
-            return;
-        }
-        u.unicast_send(this.finger_table.get(p).address, this.finger_table.get(p).port, "3||" + k);
+        if(finger_table.containsKey(p))
+            u.unicast_send(this.finger_table.get(p).address, this.finger_table.get(p).port, "3||" + k);
+        else
+            System.out.println("Node " + p + " does not exist.");
     }
 
     // crash p
