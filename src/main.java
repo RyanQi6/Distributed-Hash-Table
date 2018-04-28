@@ -90,7 +90,7 @@ public class main {
             NodeEntry master_info = new NodeEntry(0, address, master_port);
             Unicast u = new Unicast(address, node_port, Config.parseConfig("configFile"));
             SlaveNode n = new SlaveNode.NodeBuilder(new NodeEntry(id, address, node_port), client_info, master_info, u).build();
-            System.out.println("sl created");
+
             //wait for and deal with commands
             BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 

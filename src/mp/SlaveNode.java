@@ -55,7 +55,6 @@ public class SlaveNode extends Node {
 
     // join itself to the network
     public void join() {
-        System.out.println("slave node join executed");
         init_fingure_table();
         update_others();
         ask_transfer_keys(finger_table.get(0), predecessor_pointer.id, self_info.id);
@@ -87,12 +86,6 @@ public class SlaveNode extends Node {
             System.out.println("Node preceding this id: " + node_to_update.id);
             ask_update_finger_table(node_to_update, self_info, i);
         }
-    }
-
-    public int mod(int a, int b)
-    {
-        int r = a % b;
-        return r < 0 ? r + b : r;
     }
 
     public static void main(String[] args) {

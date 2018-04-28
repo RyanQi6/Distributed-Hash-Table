@@ -103,5 +103,9 @@ From HaoRan:
     3. find(k) initial, from client to node --------ip||port||3||k
     4. find response, from a node to client, the key exits -------ip||port||4||the node id containing the key||k
     5. find response, from a node to client, the key not exits --------------ip||port||5||k||key k is not found
-    6. failure recovery, from a node to its predecessor ------------ip||port||6||failed_node_id||node is down
+    6. failure recovery, from a node to its predecessor ------------ip||port||6||failed_node_id||predecessor_of_failed_node||node is down
     7. crash a node, from client to the node to be crashed ---------------ip||port||7||crash_node
+    8. first time broadcast node failure ------------ip||port||8||failed_node_id||predecessor_of_failed_node||node is down
+    9. Response of first time broadcast node failure, only apply for successor of failed node,
+        from successor of failed node to predecessor of failed node ------------ip||port||9||successor_of_failed_node (self)||failed_node_id||
+    10. Second time broadcast node failure ------------ip||port||10||failed_node_id||successor_of_fail_node_id||

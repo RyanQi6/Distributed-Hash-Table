@@ -1,0 +1,15 @@
+jtest 50
+jtest 60
+jtest 160
+jtest 250
+
+jtest
+
+crash 50
+crash 60
+crash 160
+crash 250
+
+show all
+
+show 160

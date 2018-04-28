@@ -57,8 +57,16 @@ public abstract class Node {
 
                 successor_alive = false;
                 u.unicast_send(client_info.address, client_info.port, "2||" + finger_table.get(0).id + "||node is down");
-
-                failureRecovery(finger_table.get(0).id, self_info.id);
+                if(predecessor_pointer.id != finger_table.get(0).id)
+                    //before crashing, more than two nodes in the system
+                    u.unicast_send(predecessor_pointer.address, predecessor_pointer.port, "8||"+ finger_table.get(0).id + "||" + self_info.id +  "||node is down");
+                else {
+                    //before crash, only two nodes in the system
+                    //currently only master node exists
+                    for(int i = 0; i < 8; ++i)
+                        finger_table.put(i, self_info);
+                    predecessor_pointer = self_info;
+                }
             }
         }, delay);
         return receive_timer;
@@ -77,58 +85,6 @@ public abstract class Node {
         successor_alive = true;
         destroyReceiveTimer();
         this.receive_timer = receiveHeartbeatTimer(receive_waiting_limit);
-    }
-
-    // Failure recovery: To be implemented
-    public void failureRecovery(int failed_node, int predecessor_of_failed_node) {
-        if(this.finger_table.get(0).id != failed_node && this.self_info.id == predecessor_of_failed_node){
-            return;
-        }
-//        if(failed_node <= predecessor_pointer.id + 128 && failed_node >= predecessor_pointer.id){
-            u.unicast_send(predecessor_pointer.address, predecessor_pointer.port, "6||"+ failed_node + "||" + predecessor_of_failed_node +  "||node is down");
-            if(failed_node == predecessor_pointer.id){
-//                System.out.println("Modifying the predecessor");
-                predecessor_pointer.id = predecessor_of_failed_node;
-                predecessor_pointer.port = 3000 + predecessor_of_failed_node;
-//                System.out.println("New predecessor id is: " + predecessor_pointer.id);
-            }
-//        }
-        modify_finger_table(failed_node);
-    }
-
-    // Figure table modification after the node fails
-    // case 1: failed node is not in the figure table, do nothing
-    // case 2: failed node is on the last position of the figure table
-    // case 3: failed node is not on the last position
-    public void modify_finger_table(int failed_node){
-        // case 1
-        if(failed_node > this.self_info.id + 128 || failed_node < this.self_info.id){
-            return;
-        }
-        // case 2: find the successor, and replace the failed node entries with the successor of the failed node
-        if(this.finger_table.get(this.finger_table.size()-1).id == failed_node){
-            NodeEntry successor = find_successor(failed_node);
-            for(int i=0; i<this.finger_table.size(); ++i){
-                if(this.finger_table.get(i).id == failed_node){
-                    this.finger_table.put(i, successor);
-                }
-            }
-        }
-        // case 3: replace the failed node with the successor of the failed node
-        else {
-            //find the index of failed node's successor
-            int index = -1;
-            boolean lock = false;
-            for(int i=this.finger_table.size()-1; i>=0; --i){
-                if(this.finger_table.get(i).id == failed_node ){
-                    if(!lock){
-                        index = i+1;
-                        lock = true;
-                    }
-                    this.finger_table.put(i, this.finger_table.get(index));
-                }
-            }
-        }
     }
 
     public void print_finger_table() {
@@ -321,9 +277,53 @@ public abstract class Node {
                         int fifthSplit = Utility.nthIndexOf(message, "||", 5);
                         Integer failed_node = Integer.parseInt(message.substring(thirdSplit + 2, fourthSplit));
                         Integer predecessor_failed_node = Integer.parseInt(message.substring(fourthSplit + 2, fifthSplit));
-                        failureRecovery(failed_node, predecessor_failed_node);
                     } else if(command_mode == 7) {
                         crash();
+                    } else if(command_mode == 8) {
+                        int fourthSplit = Utility.nthIndexOf(message, "||", 4);
+                        int fifthSplit = Utility.nthIndexOf(message, "||", 5);
+                        Integer failed_node = Integer.parseInt(message.substring(thirdSplit + 2, fourthSplit));
+                        Integer predecessor_failed_node = Integer.parseInt(message.substring(fourthSplit + 2, fifthSplit));
+                        if(failed_node == predecessor_pointer.id) {
+                            System.out.println("Received first time broadcast, modifying the predecessor");
+                            predecessor_pointer.id = predecessor_failed_node;
+                            predecessor_pointer.port = 3000 + predecessor_failed_node;
+                            System.out.println("New predecessor id is: " + predecessor_pointer.id);
+                            u.unicast_send(predecessor_pointer.address, predecessor_pointer.port, "9||" + self_info.id + "||" + failed_node);
+                        } else {
+                            u.unicast_send(predecessor_pointer.address, predecessor_pointer.port, "8||"+ failed_node + "||" + predecessor_failed_node +  "||node is down");
+                        }
+                    } else if(command_mode == 9) {
+                        int fourthSplit = Utility.nthIndexOf(message, "||", 4);
+                        int fifthSplit = Utility.nthIndexOf(message, "||", 5);
+                        int successor_of_failed_node = Integer.parseInt(message.substring(thirdSplit + 2, fourthSplit));
+                        Integer failed_node = Integer.parseInt(message.substring(fourthSplit + 2, fifthSplit));
+                        NodeEntry successor_info = new NodeEntry(successor_of_failed_node, "127.0.0.1", 3000 + successor_of_failed_node);
+                        finger_table.put(0, successor_info);
+                        u.unicast_send(self_info.address, self_info.port, "10||" + failed_node + "||" + successor_of_failed_node);
+                    } else if(command_mode == 10) {
+                        int fourthSplit = Utility.nthIndexOf(message, "||", 4);
+                        int fifthSplit = Utility.nthIndexOf(message, "||", 5);
+                        int failed_node_id = Integer.parseInt(message.substring(thirdSplit + 2, fourthSplit));
+                        int successor_of_failed_node = Integer.parseInt(message.substring(fourthSplit + 2, fifthSplit));
+
+                        Runnable listener = new Runnable() {
+                            @Override
+                            public void run() {
+                                for(int i = 0; i < 8; ++i) {
+                                    if(finger_table.get(i).id == failed_node_id) {
+                                        int possible_node_id = mod(self_info.id + (int)Math.pow(2, i), 256);
+                                        NodeEntry successor_info = find_successor(possible_node_id);
+                                        finger_table.put(i, successor_info);
+                                    }
+                                }
+                                if( !(self_info.id  == successor_of_failed_node) )
+                                    u.unicast_send(predecessor_pointer.address, predecessor_pointer.port, "10||" + failed_node_id + "||" + successor_of_failed_node);
+                            }
+                        };
+
+                        new Thread(listener).start();
+
                     }
                 }
             }
@@ -536,6 +536,13 @@ public abstract class Node {
     public int unwrap_id_for_other_node(int id_to_unwrap, int other_node_id) {
         return id_to_unwrap>other_node_id?id_to_unwrap:id_to_unwrap+256;
     }
+
+    public int mod(int a, int b)
+    {
+        int r = a % b;
+        return r < 0 ? r + b : r;
+    }
+
 }
 
 
