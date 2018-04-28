@@ -47,6 +47,7 @@ public class Unicast {
     }
 
     public void unicast_send(String destAddress, int destPort, String message) {
+        Node.num_message_send++;
         int delay = (int) (hostInfo.minDelay + (hostInfo.maxDelay - hostInfo.minDelay) * Math.random());
         Timer t = new Timer();
         t.schedule(new TimerTask(){

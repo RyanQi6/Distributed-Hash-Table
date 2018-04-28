@@ -3,6 +3,9 @@ import mp.*;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
 
 public class main {
     //java main master address node_port client_port
@@ -26,6 +29,8 @@ public class main {
             MasterNode masterNode = new MasterNode.NodeBuilder(node_entry, client_info, u).build();
             client.alterFingerTable(0, node_entry);
             System.out.println("Master node starts running!");
+
+            Node.num_message_send = 0;
 
             //wait for and deal with commands
             BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
@@ -71,8 +76,32 @@ public class main {
                     int p = Integer.parseInt(strings[1]);
                     int k = Integer.parseInt(strings[2]);
                     client.find(p, k);
-                }
-                else
+                } else if(strings[0].equals("PE") && strings.length == 3) {
+                    Random generator = new Random(System.currentTimeMillis());
+
+                    int N = Integer.parseInt(strings[1]);
+                    int F = Integer.parseInt(strings[2]);
+                    int num_msg_phase1 = 0;
+                    int num_msg_phase2 = 0;
+                    List<Integer> node_list = new ArrayList<>();
+                    for(int i = 0; i < N; ++i) {
+                        int id = generator.nextInt(256);
+                        while(node_list.contains(id))
+                            id = generator.nextInt(256);
+                        node_list.add(id);
+                        client.join(id);
+                    }
+                    num_msg_phase1 = client.get_total_num();
+                    System.out.println("Performance Evaluation Result:");
+                    System.out.println("N = " + N + ", F = " + F);
+                    System.out.println("phrase1 msg = " + num_msg_phase1 + ", phrase2 msg = " + num_msg_phase2);
+
+                } else if(strings[0].equals("shownum") && strings.length == 2) {
+                    int node_id = Integer.parseInt(strings[1]);
+                    System.out.println(client.ask_msg_num(node_id));
+                } else if(s.equals("totalnum")) {
+                    System.out.println(client.get_total_num());
+                }else
                     System.out.println("Invalid command.");
             }
 
@@ -124,7 +153,7 @@ public class main {
                     n.alter_finger_table(5, new NodeEntry(200, "127.0.0.1", 3200));
                     n.alter_finger_table(6, new NodeEntry(200, "127.0.0.1", 3200));
                     n.alter_finger_table(7, new NodeEntry(0, "127.0.0.1", 3000));
-                }else if(s.equals("test200")) {
+                } else if(s.equals("test200")) {
                     n.set_predecessor(new NodeEntry(120, "127.0.0.1", 3120));
                     n.alter_finger_table(0, new NodeEntry(0, "127.0.0.1", 3000));
                     n.alter_finger_table(1, new NodeEntry(0, "127.0.0.1", 3000));

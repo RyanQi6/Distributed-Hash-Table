@@ -89,6 +89,9 @@ public class Client {
                     int node_id = Integer.parseInt(message.substring(thirdSplit + 2, fourthSplit));
                     int k = Integer.parseInt(message.substring(fourthSplit + 2, message.length()-2));
                     System.out.println("Key " + k + " is in node " + node_id);
+                } else if(command.equals("ResponseMsgNum")){
+                    msg_num = Integer.parseInt(message.substring(Utility.nthIndexOf(message, "||", 3) + 2, Utility.nthIndexOf(message, "||", 4)));
+                    ask_msg_num_lock = false;
                 }
             }
             Thread.sleep(10);
@@ -100,6 +103,7 @@ public class Client {
     //communicate with ndoes
 
     // join
+    volatile join_lock = 
     public void join(int p) throws IOException {
         String currentPath = System.getProperty("user.dir");
         ProcessBuilder pb = new ProcessBuilder("java", "-cp", currentPath, "main", "slave", Integer.toString(p), "127.0.0.1", Integer.toString(finger_table.get(0).port+p), Integer.toString(u.port), Integer.toString(finger_table.get(0).port));
@@ -145,6 +149,23 @@ public class Client {
             show(i);
             show_all_lock = true;
         }
+    }
+
+    volatile boolean ask_msg_num_lock;
+    volatile int msg_num;
+    public int ask_msg_num(int node_id) {
+        ask_msg_num_lock = true;
+        u.unicast_send(finger_table.get(node_id).address, finger_table.get(node_id).port, "AskMsgNum");
+        while(ask_msg_num_lock) {}
+        return msg_num;
+    }
+
+    public int get_total_num() {
+        int total_num = 0;
+        for(Integer i: getIdList()) {
+            total_num += ask_msg_num(finger_table.get(i).id);
+        }
+        return total_num;
     }
 
     public void printFingerTable() {

@@ -4,6 +4,8 @@ import java.net.ConnectException;
 import java.util.*;
 
 public abstract class Node {
+    public static int num_message_send;
+
     NodeEntry self_info;
     NodeEntry client_info;
     Map<Integer, NodeEntry> finger_table;
@@ -281,6 +283,9 @@ public abstract class Node {
                 else if(command.equals("ResponseAskTransferKey")) {
                     ask_transfer_keys_msg = message.substring(Utility.nthIndexOf(message, "||", 2) + 2);
                     ask_transfer_keys_lock = false;
+                }
+                else if(command.equals("AskMsgNum")) {
+                    u.unicast_send(client_info.address, client_info.port,"ResponseMsgNum||" + num_message_send);
                 }
                 else {
                     int firstSplit = Utility.nthIndexOf(message, "||", 1);
