@@ -296,7 +296,7 @@ public abstract class Node {
                     }
                 }
             }
-            Thread.sleep(100);
+            Thread.sleep(10);
         }
     }
 

@@ -135,7 +135,6 @@ public class main {
                 }
                 else
                     System.out.println("Invalid command.");
-                Thread.sleep(1000);
             }
 
         } else {
