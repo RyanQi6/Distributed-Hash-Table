@@ -4,6 +4,9 @@ import java.net.ConnectException;
 import java.util.*;
 
 public abstract class Node {
+    public final int send_heartbeat_interval = 10000;  // 10s
+    public final int receive_waiting_limit = 30000;    // 30s
+
     NodeEntry self_info;
     NodeEntry client_info;
     Map<Integer, NodeEntry> finger_table;
@@ -26,7 +29,7 @@ public abstract class Node {
                 send_timer = sendHeartbeatTimer(delay);
 
                 try {
-                    System.out.println("predecessor id is: " + predecessor_pointer.id);
+//                    System.out.println("predecessor id is: " + predecessor_pointer.id);
                     u.c.startClient(predecessor_pointer.address, predecessor_pointer.port);
                 } catch (ConnectException e) {
                     return ;
@@ -73,7 +76,7 @@ public abstract class Node {
     public void receivedHeartbeat(){
         successor_alive = true;
         destroyReceiveTimer();
-        this.receive_timer = receiveHeartbeatTimer(30000);
+        this.receive_timer = receiveHeartbeatTimer(receive_waiting_limit);
     }
 
     // Failure recovery: To be implemented
@@ -84,10 +87,10 @@ public abstract class Node {
 //        if(failed_node <= predecessor_pointer.id + 128 && failed_node >= predecessor_pointer.id){
             u.unicast_send(predecessor_pointer.address, predecessor_pointer.port, "6||"+ failed_node + "||" + predecessor_of_failed_node +  "||node is down");
             if(failed_node == predecessor_pointer.id){
-                System.out.println("Modifying the predecessor");
+//                System.out.println("Modifying the predecessor");
                 predecessor_pointer.id = predecessor_of_failed_node;
                 predecessor_pointer.port = 3000 + predecessor_of_failed_node;
-                System.out.println("New predecessor id is: " + predecessor_pointer.id);
+//                System.out.println("New predecessor id is: " + predecessor_pointer.id);
             }
 //        }
         modify_finger_table(failed_node);

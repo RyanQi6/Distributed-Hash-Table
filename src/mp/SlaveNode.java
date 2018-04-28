@@ -15,9 +15,9 @@ public class SlaveNode extends Node {
         this.key_container = builder.key_container;
         this.u = builder.u;
         startListen();
-//        sendHeartbeatTimer(5000);
-//        receiveHeartbeatTimer(10000);
-//        join();
+        sendHeartbeatTimer(send_heartbeat_interval);
+        receiveHeartbeatTimer(receive_waiting_limit);
+        join();
     }
 
     public static class NodeBuilder {
@@ -55,6 +55,7 @@ public class SlaveNode extends Node {
 
     // join itself to the network
     public void join() {
+        System.out.println("slave node join executed");
         init_fingure_table();
         update_others();
         ask_transfer_keys(finger_table.get(0), predecessor_pointer.id, self_info.id);
