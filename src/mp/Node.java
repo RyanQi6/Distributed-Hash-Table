@@ -4,6 +4,9 @@ import java.net.ConnectException;
 import java.util.*;
 
 public abstract class Node {
+    public final int send_heartbeat_interval = 10000;  // 10s
+    public final int receive_waiting_limit = 30000;    // 30s
+
     NodeEntry self_info;
     NodeEntry client_info;
     Map<Integer, NodeEntry> finger_table;
@@ -73,7 +76,7 @@ public abstract class Node {
     public void receivedHeartbeat(){
         successor_alive = true;
         destroyReceiveTimer();
-        this.receive_timer = receiveHeartbeatTimer(30000);
+        this.receive_timer = receiveHeartbeatTimer(receive_waiting_limit);
     }
 
     // Failure recovery: To be implemented

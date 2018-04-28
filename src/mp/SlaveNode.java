@@ -15,9 +15,9 @@ public class SlaveNode extends Node {
         this.key_container = builder.key_container;
         this.u = builder.u;
         startListen();
-//        sendHeartbeatTimer(5000);
-//        receiveHeartbeatTimer(10000);
-//        join();
+        sendHeartbeatTimer(send_heartbeat_interval);
+        receiveHeartbeatTimer(receive_waiting_limit);
+        join();
     }
 
     public static class NodeBuilder {
