@@ -103,6 +103,8 @@ public class main {
                     System.out.println("N = " + N + ", F = " + F);
                     System.out.println(node_list);
                     System.out.println("phrase1 msg = " + num_msg_phase1 + ", phrase2 msg = " + num_msg_phase2);
+                    System.out.println("Please run: ps -ef | grep 'java' | grep -v grep | awk '{print $2}' | xargs kill -9");
+                    System.out.println("To kill processes.s");
 
                 } else if(strings[0].equals("shownum") && strings.length == 2) {
                     int node_id = Integer.parseInt(strings[1]);
