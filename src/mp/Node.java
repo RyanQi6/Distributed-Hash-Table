@@ -83,7 +83,7 @@ public abstract class Node {
     // Failure recovery: To be implemented
     public void failureRecovery(int failed_node) {
         if(failed_node <= predecessor_pointer.id + 128 && failed_node >= predecessor_pointer.id){
-            u.unicast_send(predecessor_pointer.address, predecessor_pointer.port, "6||"+ this.finger_table.get(0).id + "||node is down");
+            u.unicast_send(predecessor_pointer.address, predecessor_pointer.port, "6||"+ failed_node + "||node is down");
         }
         modify_finger_table(failed_node);
     }
