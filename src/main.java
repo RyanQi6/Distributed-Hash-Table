@@ -85,15 +85,13 @@ public class main {
                     int num_msg_phase2 = 0;
                     List<Integer> node_list = new ArrayList<>();
                     for(int i = 0; i < N; ++i) {
-//                        int id = generator.nextInt(256);
-                        int id = 128;
+                        int id = generator.nextInt(256);
                         while(node_list.contains(id))
                             id = generator.nextInt(256);
                         node_list.add(id);
                         client.join(id);
                     }
                     num_msg_phase1 = client.get_total_num();
-                    client.showAll();
                     for(int i = 0; i < F; ++i) {
                         int id = node_list.get(generator.nextInt(N));
                         int key = generator.nextInt(256);
@@ -138,8 +136,8 @@ public class main {
                 String s = br.readLine();
                 String[] strings = s.split(" ");
                 if(strings[0].equals("jtest")) {
-//                    n.sendHeartbeatTimer(5000);
-//                    n.receiveHeartbeatTimer(10000);
+                    n.sendHeartbeatTimer(5000);
+                    n.receiveHeartbeatTimer(10000);
                     n.join();
                 } else if(strings[0].equals("atd")) {
                     n.addTestData();

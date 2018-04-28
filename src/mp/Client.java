@@ -3,7 +3,6 @@ package mp;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 public class Client {
     Map<Integer, NodeEntry> finger_table;
@@ -43,7 +42,7 @@ public class Client {
         String message;
         while(true) {
             if ((message = u.unicast_receive()) != null) {
-                System.out.println("    Msg received: " + message + " " + join_lock);
+                System.out.println("    Msg received: " + message);
                 String sender_ip = message.substring(0, Utility.nthIndexOf(message, "||", 1));
                 Integer sender_port = Integer.parseInt(message.substring(Utility.nthIndexOf(message, "||", 1) + 2, Utility.nthIndexOf(message, "||", 2)));
 
@@ -84,14 +83,14 @@ public class Client {
                     int fourthSplit = Utility.nthIndexOf(message,"||", 4);
                     int k = Integer.parseInt(message.substring(thirdSplit + 2, fourthSplit));
                     System.out.println("Key " + k + " not found.");
-                    find_lock.set(false);
+                    find_lock = false;
                 } else if(command.equals("4")){
                     int thirdSplit = Utility.nthIndexOf(message, "||", 3);
                     int fourthSplit = Utility.nthIndexOf(message,"||", 4);
                     int node_id = Integer.parseInt(message.substring(thirdSplit + 2, fourthSplit));
                     int k = Integer.parseInt(message.substring(fourthSplit + 2, message.length()-2));
                     System.out.println("Key " + k + " is in node " + node_id);
-                    find_lock.set(false);
+                    find_lock = false;
                 } else if(command.equals("ResponseMsgNum")){
                     msg_num = Integer.parseInt(message.substring(Utility.nthIndexOf(message, "||", 3) + 2, Utility.nthIndexOf(message, "||", 4)));
                     ask_msg_num_lock = false;
@@ -99,7 +98,7 @@ public class Client {
                     join_lock = false;
                 }
             }
-            Thread.sleep(1);
+            Thread.sleep(10);
         }
     }
 
@@ -116,13 +115,7 @@ public class Client {
         Process pr = pb.start();
         finger_table.put(p, new NodeEntry(p, "127.0.0.1", 3000 + p));
         System.out.println("Created node " + p);
-        try {
-            while (join_lock) {
-                Thread.sleep(10);
-            }
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        while (join_lock) {}
     }
 
     public void jtest(int p) throws IOException {
@@ -131,12 +124,12 @@ public class Client {
     }
 
     // find p k
-    volatile AtomicBoolean find_lock;
+    volatile boolean find_lock;
     public void find(int p, int k) throws InterruptedException{
         if(finger_table.containsKey(p)) {
-            find_lock = new AtomicBoolean(true);
+            find_lock = true;
             u.unicast_send(this.finger_table.get(p).address, this.finger_table.get(p).port, "3||" + k);
-            while (find_lock.get()) { Thread.sleep(10); }
+            while (find_lock) { Thread.sleep(10); }
         }
         else
             System.out.println("Node " + p + " does not exist.");
@@ -162,13 +155,7 @@ public class Client {
     //show all
     public void showAll() throws IOException, InterruptedException {
         for(Integer i: getIdList()) {
-            try {
-                while (show_all_lock) {
-                    Thread.sleep(10);
-                }
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+            while (show_all_lock) { }
             show(i);
             show_all_lock = true;
         }
@@ -178,13 +165,8 @@ public class Client {
     volatile int msg_num;
     public int ask_msg_num(int node_id) {
         ask_msg_num_lock = true;
-        u.unicast_send(finger_table.get(node_id).address, finger_table.get(node_id).port, "AskMsgNum");try {
-            while (ask_msg_num_lock) {
-                Thread.sleep(10);
-            }
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        u.unicast_send(finger_table.get(node_id).address, finger_table.get(node_id).port, "AskMsgNum");
+        while(ask_msg_num_lock) {}
         return msg_num;
     }
 

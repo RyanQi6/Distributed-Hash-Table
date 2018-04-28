@@ -1,10 +1,7 @@
 package mp;
-import java.io.File;
 import java.io.IOException;
 import java.net.ConnectException;
 import java.util.*;
-import java.io.PrintWriter;
-import java.io.FileOutputStream;
 
 public abstract class Node {
     public static int num_message_send;
@@ -164,17 +161,10 @@ public abstract class Node {
         String message;
         while(true) {
             if ((message = u.unicast_receive()) != null) {
-//                u.unicast_send(client_info.address, client_info.port, cnt + "I received msg." + message + ask_find_successor_lock + ask_closest_preceding_finger_lock + ask_return_predecessor_lock
-//                        + ask_set_predecessor_lock + ask_update_finger_table_lock + ask_read_finger_table_lock
-//                        + ask_alter_finger_table_lock + ask_transfer_keys_lock);
                 System.out.println("    Msg received: " + message);
-                PrintWriter out = new PrintWriter(new FileOutputStream(new File("log" + self_info.id + ".txt"), true));
-                out.println("    Msg received: " + message);
-
                 String sender_ip = message.substring(0, Utility.nthIndexOf(message, "||", 1));
                 Integer sender_port = Integer.parseInt(message.substring(Utility.nthIndexOf(message, "||", 1) + 2, Utility.nthIndexOf(message, "||", 2)));
                 String command = message.substring(Utility.nthIndexOf(message, "||", 2) + 2, Utility.nthIndexOf(message, "||", 3));
-//                u.unicast_send(client_info.address, client_info.port, "Command is " + command);
                 if(command.equals("ShowYourself")) {
                     String response = "ResponseMyself";
                     response += "||" + self_info.id + "||" + key_container.size();
@@ -193,7 +183,6 @@ public abstract class Node {
                         @Override
                         public void run() {
                             deal_with_be_AskedFindSuccessor(sender_ip, sender_port, id);
-
                         }
                     };
 
@@ -252,7 +241,6 @@ public abstract class Node {
                     ask_read_finger_table_lock = false;
                 }
                 else if(command.equals("AskClosestPrecedingFinger")) {
-                    u.unicast_send(client_info.address, client_info.port, "I entered AskClosestPrecedingFinger");
                     int id = Integer.parseInt(message.substring(Utility.nthIndexOf(message, "||", 3) + 2, Utility.nthIndexOf(message, "||", 4)));
                     NodeEntry node_info = closest_preceding_finger(id);
                     String response = "ResponseAskClosestPrecedingFinger||" + node_info.id + "||" + node_info.address + "||" + node_info.port;
@@ -326,16 +314,8 @@ public abstract class Node {
                         failureRecovery(failed_node);
                     } else if(command_mode == 7) {
                         crash();
-                    } else if(command_mode == 8) {
-                        int k = Integer.parseInt(message.substring(thirdSplit + 2, message.length()-2));
-                        if(this.key_container.contains(k))
-                            u.unicast_send(client_info.address, client_info.port, "4||" + this.self_info.id + "||" + k);
-                        else
-                            u.unicast_send(client_info.address, client_info.port, "5||" + k + "||key k is not found");
                     }
                 }
-                out.println("    This round end.");
-                out.close();
             }
             Thread.sleep(10);
         }
@@ -343,7 +323,6 @@ public abstract class Node {
 
     // find p k
     public void find(int k){
-        u.unicast_send(client_info.address, client_info.port, "Dealing with find.");
         if(k < 0 || k > 255){
             u.unicast_send(client_info.address, client_info.port, "5||" + k + "||key k is not found");
             return;
@@ -356,12 +335,8 @@ public abstract class Node {
             else
                 u.unicast_send(client_info.address, client_info.port, "5||" + k + "||key k is not found");
         } else {
-                u.unicast_send(successor.address, successor.port, "8||" + k);
+                u.unicast_send(successor.address, successor.port, "3||" + k);
         }
-        u.unicast_send(client_info.address, client_info.port, "Finished dealing with find. "
-                + ask_find_successor_lock + ask_closest_preceding_finger_lock + ask_return_predecessor_lock
-                + ask_set_predecessor_lock + ask_update_finger_table_lock + ask_read_finger_table_lock
-                + ask_alter_finger_table_lock + ask_transfer_keys_lock);
     }
 
     public void crash() {
@@ -393,13 +368,7 @@ public abstract class Node {
         ask_find_successor_lock = true;
         //msg = "AskFindSuccessor||id"
         u.unicast_send(performer.address, performer.port, "AskFindSuccessor||" + id);
-        try {
-            while (ask_find_successor_lock) {
-                Thread.sleep(10);
-            }
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        while(ask_find_successor_lock) {}
         //msg = "ResponseAskFindSuccessor||successor's id||successor's address||successor's port"
         int successor_id = Integer.parseInt(ask_find_successor_msg.substring(Utility.nthIndexOf(ask_find_successor_msg, "||", 1) + 2, Utility.nthIndexOf(ask_find_successor_msg, "||", 2)));
         String successor_address = ask_find_successor_msg.substring(Utility.nthIndexOf(ask_find_successor_msg, "||", 2) + 2, Utility.nthIndexOf(ask_find_successor_msg, "||", 3));
@@ -412,9 +381,6 @@ public abstract class Node {
         NodeEntry successor = find_successor(id);
         String response = "ResponseAskFindSuccessor||" + successor.id + "||" + successor.address + "||" + successor.port;
         u.unicast_send(sender_ip, sender_port, response);
-        u.unicast_send(client_info.address, client_info.port,  "Finished deal_with_be_AskedFindSuccessor " + ask_find_successor_lock + ask_closest_preceding_finger_lock + ask_return_predecessor_lock
-                + ask_set_predecessor_lock + ask_update_finger_table_lock + ask_read_finger_table_lock
-                + ask_alter_finger_table_lock + ask_transfer_keys_lock);
     }
 
     //find successor of id
@@ -440,13 +406,7 @@ public abstract class Node {
         ask_closest_preceding_finger_lock = true;
         //msg = "AskClosestPrecedingFinger||id"
         u.unicast_send(performer.address, performer.port, "AskClosestPrecedingFinger||" + id);
-        try {
-            while (ask_closest_preceding_finger_lock) {
-                Thread.sleep(10);
-            }
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        while(ask_closest_preceding_finger_lock) {}
         //msg = "ResponseAskClosestPrecedingFinger||id||address||port"
         int node_id = Integer.parseInt(ask_closest_preceding_finger_msg.substring(Utility.nthIndexOf(ask_closest_preceding_finger_msg, "||", 1) + 2, Utility.nthIndexOf(ask_closest_preceding_finger_msg, "||", 2)));
         String node_address = ask_closest_preceding_finger_msg.substring(Utility.nthIndexOf(ask_closest_preceding_finger_msg, "||", 2) + 2, Utility.nthIndexOf(ask_closest_preceding_finger_msg, "||", 3));
@@ -470,13 +430,7 @@ public abstract class Node {
         ask_return_predecessor_lock = true;
         //msg = "AskReturnPredecessor"
         u.unicast_send(performer.address, performer.port, "AskReturnPredecessor");
-        try {
-            while (ask_return_predecessor_lock) {
-                Thread.sleep(10);
-            }
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        while(ask_return_predecessor_lock) {}
         //msg = "ResponseAskReturnPredecessor||predecessor's id||predecessor's address||predecessor's port"
         int predecessor_id = Integer.parseInt(ask_return_predecessor_msg.substring(Utility.nthIndexOf(ask_return_predecessor_msg, "||", 1) + 2, Utility.nthIndexOf(ask_return_predecessor_msg, "||", 2)));
         String predecessor_address = ask_return_predecessor_msg.substring(Utility.nthIndexOf(ask_return_predecessor_msg, "||", 2) + 2, Utility.nthIndexOf(ask_return_predecessor_msg, "||", 3));
@@ -491,13 +445,7 @@ public abstract class Node {
         ask_set_predecessor_lock = true;
         //msg = "AskSetPredecessor||predecessor's id||predecessor's address||predecessor's port"
         u.unicast_send(performer.address, performer.port, "AskSetPredecessor||" + predecessor.id + "||" + predecessor.address + "||" + predecessor.port);
-        try {
-            while (ask_set_predecessor_lock) {
-                Thread.sleep(10);
-            }
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        while (ask_set_predecessor_lock) {}
     }
 
     //ask node to update its finger table (for join process)
@@ -506,13 +454,7 @@ public abstract class Node {
         ask_update_finger_table_lock = true;
         //msg = "AskUpdateFingerTable||index||id||address||port"
         u.unicast_send(performer.address, performer.port, "AskUpdateFingerTable||" + i + "||" + node_info.id + "||" + node_info.address + "||" + node_info.port);
-        try {
-            while (ask_update_finger_table_lock) {
-                Thread.sleep(10);
-            }
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        while(ask_update_finger_table_lock) {}
     }
 
 
@@ -523,12 +465,7 @@ public abstract class Node {
         ask_read_finger_table_lock = true;
         //msg = "AskReadFingerTable||index"
         u.unicast_send(performer.address, performer.port, "AskReadFingerTable||" + i);
-        try {
-            while (ask_read_finger_table_lock) {
-                Thread.sleep(10);
-            }
-        } catch (InterruptedException e) {
-            e.printStackTrace();
+        while (ask_read_finger_table_lock) {
         }
         //msg = "ResponseAskReadFingerTable||id||address||port"
         int id = Integer.parseInt(ask_read_finger_table_msg.substring(Utility.nthIndexOf(ask_read_finger_table_msg, "||", 1) + 2, Utility.nthIndexOf(ask_read_finger_table_msg, "||", 2)));
@@ -544,13 +481,7 @@ public abstract class Node {
         ask_alter_finger_table_lock = true;
         //msg = "AskAlterFingerTable||i||id||address||port"
         u.unicast_send(performer.address, performer.port, "AskAlterFingerTable||" + i + "||" + node_info.id + "||" + node_info.address + "||" + node_info.port);
-        try {
-            while (ask_alter_finger_table_lock) {
-                Thread.sleep(10);
-            }
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        while(ask_alter_finger_table_lock) {}
     }
 
     public void update_finger_table(NodeEntry node_info, int i) {
@@ -564,9 +495,6 @@ public abstract class Node {
         update_finger_table(node_info, i);
         String response = "ResponseAskUpdateFingerTable";
         u.unicast_send(sender_ip, sender_port, response);
-        u.unicast_send(client_info.address, client_info.port, "Finished deal_with_be_AskedUpdateFingerTable " + ask_find_successor_lock + ask_closest_preceding_finger_lock + ask_return_predecessor_lock
-                + ask_set_predecessor_lock + ask_update_finger_table_lock + ask_read_finger_table_lock
-                + ask_alter_finger_table_lock + ask_transfer_keys_lock);
     }
 
     //ask node to transfer some of its keys to caller
@@ -576,12 +504,7 @@ public abstract class Node {
         ask_transfer_keys_lock = true;
         //msg = "AskTransferKey||minimal key number (exclusive)||maximum key number (inclusive)"
         u.unicast_send(performer.address, performer.port, "AskTransferKey||" + minimal + "||" + maximal);
-        try {
-            while (ask_transfer_keys_lock) {
-                Thread.sleep(10);
-            }
-        } catch (InterruptedException e) {
-            e.printStackTrace();
+        while (ask_transfer_keys_lock) {
         }
         //msg = "ResponseAskTransferKey||number of keys||first key||second key||...||last key||"
         //notice that this msg is slightly different from others that there is "||" in the end
