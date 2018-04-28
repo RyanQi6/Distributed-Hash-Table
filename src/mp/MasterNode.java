@@ -18,8 +18,8 @@ public class MasterNode extends Node {
         for(int i = 0; i < 256; ++i) {
             this.key_container.add(i);
         }
-        this.sendHeartbeatTimer(5000);
-        this.receiveHeartbeatTimer(10000);
+        this.sendHeartbeatTimer(10000);
+        this.receiveHeartbeatTimer(30000);
         startListen();
     }
 

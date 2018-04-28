@@ -26,6 +26,7 @@ public abstract class Node {
                 send_timer = sendHeartbeatTimer(delay);
 
                 try {
+                    System.out.println("predecessor id is: " + predecessor_pointer.id);
                     u.c.startClient(predecessor_pointer.address, predecessor_pointer.port);
                 } catch (ConnectException e) {
                     return ;
@@ -54,7 +55,7 @@ public abstract class Node {
                 successor_alive = false;
                 u.unicast_send(client_info.address, client_info.port, "2||" + finger_table.get(0).id + "||node is down");
 
-                failureRecovery(finger_table.get(0).id);
+                failureRecovery(finger_table.get(0).id, self_info.id);
             }
         }, delay);
         return receive_timer;
@@ -72,14 +73,23 @@ public abstract class Node {
     public void receivedHeartbeat(){
         successor_alive = true;
         destroyReceiveTimer();
-        this.receive_timer = receiveHeartbeatTimer(10000);
+        this.receive_timer = receiveHeartbeatTimer(30000);
     }
 
     // Failure recovery: To be implemented
-    public void failureRecovery(int failed_node) {
-        if(failed_node <= predecessor_pointer.id + 128 && failed_node >= predecessor_pointer.id){
-            u.unicast_send(predecessor_pointer.address, predecessor_pointer.port, "6||"+ failed_node + "||node is down");
+    public void failureRecovery(int failed_node, int predecessor_of_failed_node) {
+        if(this.finger_table.get(0).id != failed_node && this.self_info.id == predecessor_of_failed_node){
+            return;
         }
+//        if(failed_node <= predecessor_pointer.id + 128 && failed_node >= predecessor_pointer.id){
+            u.unicast_send(predecessor_pointer.address, predecessor_pointer.port, "6||"+ failed_node + "||" + predecessor_of_failed_node +  "||node is down");
+            if(failed_node == predecessor_pointer.id){
+                System.out.println("Modifying the predecessor");
+                predecessor_pointer.id = predecessor_of_failed_node;
+                predecessor_pointer.port = 3000 + predecessor_of_failed_node;
+                System.out.println("New predecessor id is: " + predecessor_pointer.id);
+            }
+//        }
         modify_finger_table(failed_node);
     }
 
@@ -305,8 +315,10 @@ public abstract class Node {
 
                     } else if(command_mode == 6) {
                         int fourthSplit = Utility.nthIndexOf(message, "||", 4);
+                        int fifthSplit = Utility.nthIndexOf(message, "||", 5);
                         Integer failed_node = Integer.parseInt(message.substring(thirdSplit + 2, fourthSplit));
-                        failureRecovery(failed_node);
+                        Integer predecessor_failed_node = Integer.parseInt(message.substring(fourthSplit + 2, fifthSplit));
+                        failureRecovery(failed_node, predecessor_failed_node);
                     } else if(command_mode == 7) {
                         crash();
                     }
