@@ -15,11 +15,6 @@ public abstract class Node {
     Timer send_timer;
     Timer receive_timer;
 
-    public Node() {
-        sendHeartbeatTimer(5000);
-        receiveHeartbeatTimer(10000);
-    }
-
     // Failure Detection
     // Timer setter
     public Timer sendHeartbeatTimer(int delay) {

@@ -5,7 +5,6 @@ import java.util.*;
 public class MasterNode extends Node {
     // builder pattern
     public MasterNode(NodeBuilder builder) throws IOException {
-        super();
         this.self_info = builder.self_info;
         this.client_info = builder.client_info;
         this.finger_table = builder.finger_table;
@@ -19,7 +18,8 @@ public class MasterNode extends Node {
         for(int i = 0; i < 256; ++i) {
             this.key_container.add(i);
         }
-
+        this.sendHeartbeatTimer(5000);
+        this.receiveHeartbeatTimer(10000);
         startListen();
     }
 

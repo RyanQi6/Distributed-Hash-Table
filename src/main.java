@@ -99,6 +99,8 @@ public class main {
                 String s = br.readLine();
                 String[] strings = s.split(" ");
                 if(strings[0].equals("jtest")) {
+                    n.sendHeartbeatTimer(5000);
+                    n.receiveHeartbeatTimer(10000);
                     n.join();
                 } else if(strings[0].equals("atd")) {
                     n.addTestData();
