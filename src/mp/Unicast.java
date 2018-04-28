@@ -3,7 +3,10 @@ package mp;
 import mp.TCP.Client;
 import mp.TCP.Server;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.*;
 
 public class Unicast {
@@ -71,6 +74,9 @@ class synchronizedSend {
             c.startClient(destAddress, destPort);
             c.sendMessage(senderAddress + "||" + senderPort + "||" + message + "||");
             System.out.println("    Msg to: " + destAddress + ":" + destPort + "   Content: " + senderAddress +"||" + senderPort + "||" + message + "||");
+            PrintWriter out = new PrintWriter(new FileOutputStream(new File("log" + (senderPort-3000) + ".txt"), true));
+            out.println("    Msg to: " + destAddress + ":" + destPort + "   Content: " + senderAddress +"||" + senderPort + "||" + message + "||");
+            out.close();
             c.closeClient();
         } catch (IOException | InterruptedException e) {
             e.printStackTrace();
