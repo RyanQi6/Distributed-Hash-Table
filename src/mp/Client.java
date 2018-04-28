@@ -77,7 +77,9 @@ public class Client {
                     int thirdSplit = Utility.nthIndexOf(message, "||", 3);
                     int fourthSplit = Utility.nthIndexOf(message,"||", 4);
                     Integer failed_node = Integer.parseInt(message.substring(thirdSplit + 2, fourthSplit));
-                    System.out.println("Node " + failed_node + " is down!");
+                    if(this.finger_table.remove(failed_node) != null){
+                        System.out.println("Node " + failed_node + " is down!");
+                    }
                 } else if(command.equals("5")){
                     int thirdSplit = Utility.nthIndexOf(message, "||", 3);
                     int fourthSplit = Utility.nthIndexOf(message,"||", 4);

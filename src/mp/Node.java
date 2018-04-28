@@ -102,7 +102,7 @@ public abstract class Node {
     // case 3: failed node is not on the last position
     public void modify_finger_table(int failed_node){
         // case 1
-        if(failed_node > this.self_info.id + 128 || failed_node < this.self_info.id){
+        if((failed_node > this.self_info.id) && (failed_node > this.self_info.id + 128) || (failed_node < this.self_info.id) && (failed_node < this.self_info.id - 128)  ){
             return;
         }
         // case 2: find the successor, and replace the failed node entries with the successor of the failed node
