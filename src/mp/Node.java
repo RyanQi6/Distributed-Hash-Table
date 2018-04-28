@@ -1,17 +1,135 @@
 package mp;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.net.ConnectException;
+import java.util.*;
 
 public abstract class Node {
+    public final int send_heartbeat_interval = 10000;  // 10s
+    public final int receive_waiting_limit = 30000;    // 30s
+
     NodeEntry self_info;
     NodeEntry client_info;
     Map<Integer, NodeEntry> finger_table;
     NodeEntry predecessor_pointer;
     List<Integer> key_container;
     Unicast u;
+
+    public boolean successor_alive = true;
+    Timer send_timer;
+    Timer receive_timer;
+
+    // Failure Detection
+    // Timer setter
+    public Timer sendHeartbeatTimer(int delay) {
+        this.send_timer = new Timer();
+        this.send_timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                destroySendTimer();
+                send_timer = sendHeartbeatTimer(delay);
+
+                try {
+//                    System.out.println("predecessor id is: " + predecessor_pointer.id);
+                    u.c.startClient(predecessor_pointer.address, predecessor_pointer.port);
+                } catch (ConnectException e) {
+                    return ;
+                } catch(IOException | InterruptedException e) {
+                    e.printStackTrace();
+                }
+                try {
+                    u.c.closeClient();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                u.unicast_send(predecessor_pointer.address, predecessor_pointer.port, "1||successor is alive");
+            }
+        }, delay);
+        return send_timer;
+    }
+
+    public Timer receiveHeartbeatTimer(int delay) {
+        this.receive_timer = new Timer();
+        this.receive_timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                destroyReceiveTimer();
+                receive_timer = receiveHeartbeatTimer(delay);
+
+                successor_alive = false;
+                u.unicast_send(client_info.address, client_info.port, "2||" + finger_table.get(0).id + "||node is down");
+
+                failureRecovery(finger_table.get(0).id, self_info.id);
+            }
+        }, delay);
+        return receive_timer;
+    }
+
+    // Timer destroyer
+    public void destroySendTimer(){
+        this.send_timer.cancel();
+    }
+    public void destroyReceiveTimer(){
+        this.receive_timer.cancel();
+    }
+
+    // When the heartbeat from successor is received, clear the timer, and time again
+    public void receivedHeartbeat(){
+        successor_alive = true;
+        destroyReceiveTimer();
+        this.receive_timer = receiveHeartbeatTimer(receive_waiting_limit);
+    }
+
+    // Failure recovery: To be implemented
+    public void failureRecovery(int failed_node, int predecessor_of_failed_node) {
+        if(this.finger_table.get(0).id != failed_node && this.self_info.id == predecessor_of_failed_node){
+            return;
+        }
+//        if(failed_node <= predecessor_pointer.id + 128 && failed_node >= predecessor_pointer.id){
+            u.unicast_send(predecessor_pointer.address, predecessor_pointer.port, "6||"+ failed_node + "||" + predecessor_of_failed_node +  "||node is down");
+            if(failed_node == predecessor_pointer.id){
+//                System.out.println("Modifying the predecessor");
+                predecessor_pointer.id = predecessor_of_failed_node;
+                predecessor_pointer.port = 3000 + predecessor_of_failed_node;
+//                System.out.println("New predecessor id is: " + predecessor_pointer.id);
+            }
+//        }
+        modify_finger_table(failed_node);
+    }
+
+    // Figure table modification after the node fails
+    // case 1: failed node is not in the figure table, do nothing
+    // case 2: failed node is on the last position of the figure table
+    // case 3: failed node is not on the last position
+    public void modify_finger_table(int failed_node){
+        // case 1
+        if(failed_node > this.self_info.id + 128 || failed_node < this.self_info.id){
+            return;
+        }
+        // case 2: find the successor, and replace the failed node entries with the successor of the failed node
+        if(this.finger_table.get(this.finger_table.size()-1).id == failed_node){
+            NodeEntry successor = find_successor(failed_node);
+            for(int i=0; i<this.finger_table.size(); ++i){
+                if(this.finger_table.get(i).id == failed_node){
+                    this.finger_table.put(i, successor);
+                }
+            }
+        }
+        // case 3: replace the failed node with the successor of the failed node
+        else {
+            //find the index of failed node's successor
+            int index = -1;
+            boolean lock = false;
+            for(int i=this.finger_table.size()-1; i>=0; --i){
+                if(this.finger_table.get(i).id == failed_node ){
+                    if(!lock){
+                        index = i+1;
+                        lock = true;
+                    }
+                    this.finger_table.put(i, this.finger_table.get(index));
+                }
+            }
+        }
+    }
 
     public void print_finger_table() {
         System.out.println(finger_table);
@@ -177,14 +295,63 @@ public abstract class Node {
                     ask_transfer_keys_msg = message.substring(Utility.nthIndexOf(message, "||", 2) + 2);
                     ask_transfer_keys_lock = false;
                 }
+                else {
+                    int firstSplit = Utility.nthIndexOf(message, "||", 1);
+                    int secondSplit = Utility.nthIndexOf(message, "||", 2);
+                    int thirdSplit = Utility.nthIndexOf(message, "||", 3);
+
+                    Integer command_mode = Integer.parseInt(message.substring(secondSplit + 2, thirdSplit));
+
+                    // command mode switch
+                    if(command_mode == 1){
+                        receivedHeartbeat();
+                    } else if(command_mode == 3){
+                        int k = Integer.parseInt(message.substring(thirdSplit + 2, message.length()-2));
+                        //start a new thread to avoid blocking listen() function
+                        Runnable listener = new Runnable() {
+                            @Override
+                            public void run() {
+                                find(k);
+                            }
+                        };
+                        new Thread(listener).start();
+
+                    } else if(command_mode == 6) {
+                        int fourthSplit = Utility.nthIndexOf(message, "||", 4);
+                        int fifthSplit = Utility.nthIndexOf(message, "||", 5);
+                        Integer failed_node = Integer.parseInt(message.substring(thirdSplit + 2, fourthSplit));
+                        Integer predecessor_failed_node = Integer.parseInt(message.substring(fourthSplit + 2, fifthSplit));
+                        failureRecovery(failed_node, predecessor_failed_node);
+                    } else if(command_mode == 7) {
+                        crash();
+                    }
+                }
             }
-            Thread.sleep(100);
+            Thread.sleep(10);
         }
     }
 
-    public abstract void find(int k);
+    // find p k
+    public void find(int k){
+        if(k < 0 || k > 255){
+            u.unicast_send(client_info.address, client_info.port, "5||" + k + "||key k is not found");
+            return;
+        }
 
-    public abstract void crash();
+        NodeEntry successor = find_successor(k);
+        if(self_info.id == successor.id){
+            if(this.key_container.contains(k))
+                u.unicast_send(client_info.address, client_info.port, "4||" + this.self_info.id + "||" + k);
+            else
+                u.unicast_send(client_info.address, client_info.port, "5||" + k + "||key k is not found");
+        } else {
+            u.unicast_send(successor.address, successor.port, "3||" + k);
+        }
+    }
+
+    public void crash() {
+        System.exit(1);
+    }
 
     public void addTestData() {
         alter_finger_table(0,new NodeEntry(self_info.id + 1,"222.222.111.111", 9999));

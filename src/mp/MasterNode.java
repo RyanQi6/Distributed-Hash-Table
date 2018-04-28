@@ -18,6 +18,8 @@ public class MasterNode extends Node {
         for(int i = 0; i < 256; ++i) {
             this.key_container.add(i);
         }
+        this.sendHeartbeatTimer(send_heartbeat_interval);
+        this.receiveHeartbeatTimer(receive_waiting_limit);
         startListen();
     }
 
@@ -46,15 +48,4 @@ public class MasterNode extends Node {
     //communicate with client
 
     //initalize finger table
-
-
-    // find p k
-    @ Override
-    public void find(int k) {
-
-    };
-
-    // crash p
-    @ Override
-    public void crash() {};
 }

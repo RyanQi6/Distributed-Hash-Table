@@ -54,7 +54,7 @@ public class Server {
                     this.read(key, messageBuffer);
                 }
             }
-            Thread.sleep(100);
+            Thread.sleep(10);
         }
     }
 

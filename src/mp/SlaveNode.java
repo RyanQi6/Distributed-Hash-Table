@@ -15,6 +15,8 @@ public class SlaveNode extends Node {
         this.key_container = builder.key_container;
         this.u = builder.u;
         startListen();
+        sendHeartbeatTimer(send_heartbeat_interval);
+        receiveHeartbeatTimer(receive_waiting_limit);
         join();
     }
 
@@ -53,6 +55,7 @@ public class SlaveNode extends Node {
 
     // join itself to the network
     public void join() {
+        System.out.println("slave node join executed");
         init_fingure_table();
         update_others();
         ask_transfer_keys(finger_table.get(0), predecessor_pointer.id, self_info.id);
@@ -91,16 +94,6 @@ public class SlaveNode extends Node {
         int r = a % b;
         return r < 0 ? r + b : r;
     }
-
-    // find p k
-    @ Override
-    public void find(int k) {
-
-    };
-
-    // crash p
-    @ Override
-    public void crash() {};
 
     public static void main(String[] args) {
 

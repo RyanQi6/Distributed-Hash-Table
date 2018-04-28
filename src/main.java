@@ -35,6 +35,8 @@ public class main {
                 String[] strings = s.split(" ");
                 if(strings[0].equals("join") && strings.length == 2) {
                     client.join(Integer.parseInt(strings[1]));
+                } else if(strings[0].equals("crash") && strings.length == 2) {
+                    client.crash(Integer.parseInt(strings[1]));
                 } else if(strings[0].equals("jtest") && strings.length == 2) {
                     client.jtest(Integer.parseInt(strings[1]));
                 } else if(s.equals("jointest")) {
@@ -65,6 +67,10 @@ public class main {
                     masterNode.alter_finger_table(5, new NodeEntry(50, "127.0.0.1", 3050));
                     masterNode.alter_finger_table(6, new NodeEntry(120, "127.0.0.1", 3120));
                     masterNode.alter_finger_table(7, new NodeEntry(200, "127.0.0.1", 3200));
+                } else if(strings[0].equals("find") && strings.length == 3) {
+                    int p = Integer.parseInt(strings[1]);
+                    int k = Integer.parseInt(strings[2]);
+                    client.find(p, k);
                 }
                 else
                     System.out.println("Invalid command.");
@@ -84,7 +90,7 @@ public class main {
             NodeEntry master_info = new NodeEntry(0, address, master_port);
             Unicast u = new Unicast(address, node_port, Config.parseConfig("configFile"));
             SlaveNode n = new SlaveNode.NodeBuilder(new NodeEntry(id, address, node_port), client_info, master_info, u).build();
-
+            System.out.println("sl created");
             //wait for and deal with commands
             BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 
@@ -93,6 +99,8 @@ public class main {
                 String s = br.readLine();
                 String[] strings = s.split(" ");
                 if(strings[0].equals("jtest")) {
+                    n.sendHeartbeatTimer(n.send_heartbeat_interval);
+                    n.receiveHeartbeatTimer(n.receive_waiting_limit);
                     n.join();
                 } else if(strings[0].equals("atd")) {
                     n.addTestData();
@@ -129,7 +137,6 @@ public class main {
                 }
                 else
                     System.out.println("Invalid command.");
-                Thread.sleep(1000);
             }
 
         } else {
