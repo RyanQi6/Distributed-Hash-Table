@@ -85,8 +85,7 @@ public class main {
                     int num_msg_phase2 = 0;
                     List<Integer> node_list = new ArrayList<>();
                     for(int i = 0; i < N; ++i) {
-//                        int id = generator.nextInt(256);
-                        int id = 128;
+                        int id = generator.nextInt(256);
                         while(node_list.contains(id))
                             id = generator.nextInt(256);
                         node_list.add(id);
