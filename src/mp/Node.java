@@ -1,5 +1,6 @@
 package mp;
 import java.io.IOException;
+import java.net.ConnectException;
 import java.util.*;
 
 public abstract class Node {
@@ -29,6 +30,18 @@ public abstract class Node {
                 destroySendTimer();
                 send_timer = sendHeartbeatTimer(delay);
 
+                try {
+                    u.c.startClient(predecessor_pointer.address, predecessor_pointer.port);
+                } catch (ConnectException e) {
+                    return ;
+                } catch(IOException | InterruptedException e) {
+                    e.printStackTrace();
+                }
+                try {
+                    u.c.closeClient();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
                 u.unicast_send(predecessor_pointer.address, predecessor_pointer.port, "1||successor is alive");
             }
         }, delay);
