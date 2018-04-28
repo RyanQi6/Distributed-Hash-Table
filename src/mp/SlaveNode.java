@@ -17,7 +17,7 @@ public class SlaveNode extends Node {
         startListen();
 //        sendHeartbeatTimer(5000);
 //        receiveHeartbeatTimer(10000);
-//        join();
+        join();
     }
 
     public static class NodeBuilder {
