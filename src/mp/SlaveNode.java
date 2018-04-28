@@ -87,8 +87,4 @@ public class SlaveNode extends Node {
             ask_update_finger_table(node_to_update, self_info, i);
         }
     }
-
-    public static void main(String[] args) {
-
-    }
 }

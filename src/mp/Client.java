@@ -93,7 +93,7 @@ public class Client {
                     System.out.println("Key " + k + " is in node " + node_id);
                 }
             }
-            Thread.sleep(10);
+            Thread.sleep(1);
         }
     }
 
