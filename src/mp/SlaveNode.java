@@ -93,10 +93,6 @@ public class SlaveNode extends Node {
         return r < 0 ? r + b : r;
     }
 
-    // crash p
-    @ Override
-    public void crash() {};
-
     public static void main(String[] args) {
 
     }

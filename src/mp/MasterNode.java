@@ -48,8 +48,4 @@ public class MasterNode extends Node {
     //communicate with client
 
     //initalize finger table
-
-    // crash p
-    @ Override
-    public void crash() {};
 }

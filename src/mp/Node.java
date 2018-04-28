@@ -291,6 +291,8 @@ public abstract class Node {
                         int fourthSplit = Utility.nthIndexOf(message, "||", 4);
                         Integer failed_node = Integer.parseInt(message.substring(thirdSplit + 2, fourthSplit));
                         failureRecovery(failed_node);
+                    } else if(command_mode == 7) {
+                        crash();
                     }
                 }
             }
@@ -346,7 +348,9 @@ public abstract class Node {
         }
     }
 
-    public abstract void crash();
+    public void crash() {
+        System.exit(1);
+    }
 
     public void addTestData() {
         alter_finger_table(0,new NodeEntry(self_info.id + 1,"222.222.111.111", 9999));
