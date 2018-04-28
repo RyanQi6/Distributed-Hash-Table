@@ -15,9 +15,9 @@ public class SlaveNode extends Node {
         this.key_container = builder.key_container;
         this.u = builder.u;
         startListen();
-//        sendHeartbeatTimer(send_heartbeat_interval);
-//        receiveHeartbeatTimer(receive_waiting_limit);
-//        join();
+        sendHeartbeatTimer(send_heartbeat_interval);
+        receiveHeartbeatTimer(receive_waiting_limit);
+        join();
     }
 
     public static class NodeBuilder {
@@ -86,12 +86,6 @@ public class SlaveNode extends Node {
             System.out.println("Node preceding this id: " + node_to_update.id);
             ask_update_finger_table(node_to_update, self_info, i);
         }
-    }
-
-    public int mod(int a, int b)
-    {
-        int r = a % b;
-        return r < 0 ? r + b : r;
     }
 
     public static void main(String[] args) {
