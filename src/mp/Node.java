@@ -57,8 +57,16 @@ public abstract class Node {
 
                 successor_alive = false;
                 u.unicast_send(client_info.address, client_info.port, "2||" + finger_table.get(0).id + "||node is down");
-
-                u.unicast_send(predecessor_pointer.address, predecessor_pointer.port, "8||"+ finger_table.get(0).id + "||" + self_info.id +  "||node is down");
+                if(predecessor_pointer.id != finger_table.get(0).id)
+                    //before crashing, more than two nodes in the system
+                    u.unicast_send(predecessor_pointer.address, predecessor_pointer.port, "8||"+ finger_table.get(0).id + "||" + self_info.id +  "||node is down");
+                else {
+                    //before crash, only two nodes in the system
+                    //currently only master node exists
+                    for(int i = 0; i < 8; ++i)
+                        finger_table.put(i, self_info);
+                    predecessor_pointer = self_info;
+                }
             }
         }, delay);
         return receive_timer;
@@ -78,7 +86,7 @@ public abstract class Node {
         destroyReceiveTimer();
         this.receive_timer = receiveHeartbeatTimer(receive_waiting_limit);
     }
-    
+
     public void print_finger_table() {
         System.out.println(finger_table);
     }
@@ -261,7 +269,6 @@ public abstract class Node {
                         int fifthSplit = Utility.nthIndexOf(message, "||", 5);
                         Integer failed_node = Integer.parseInt(message.substring(thirdSplit + 2, fourthSplit));
                         Integer predecessor_failed_node = Integer.parseInt(message.substring(fourthSplit + 2, fifthSplit));
-                        failureRecovery(failed_node, predecessor_failed_node);
                     } else if(command_mode == 7) {
                         crash();
                     } else if(command_mode == 8) {
