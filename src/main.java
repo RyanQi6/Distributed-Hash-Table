@@ -94,6 +94,7 @@ public class main {
                     num_msg_phase1 = client.get_total_num();
                     System.out.println("Performance Evaluation Result:");
                     System.out.println("N = " + N + ", F = " + F);
+                    System.out.println(node_list);
                     System.out.println("phrase1 msg = " + num_msg_phase1 + ", phrase2 msg = " + num_msg_phase2);
 
                 } else if(strings[0].equals("shownum") && strings.length == 2) {

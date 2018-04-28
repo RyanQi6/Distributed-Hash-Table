@@ -92,6 +92,8 @@ public class Client {
                 } else if(command.equals("ResponseMsgNum")){
                     msg_num = Integer.parseInt(message.substring(Utility.nthIndexOf(message, "||", 3) + 2, Utility.nthIndexOf(message, "||", 4)));
                     ask_msg_num_lock = false;
+                } else if(command.equals("ResponseJoin")){
+                    join_lock = false;
                 }
             }
             Thread.sleep(10);
@@ -103,13 +105,15 @@ public class Client {
     //communicate with ndoes
 
     // join
-    volatile join_lock = 
+    volatile boolean join_lock;
     public void join(int p) throws IOException {
+        join_lock = true;
         String currentPath = System.getProperty("user.dir");
         ProcessBuilder pb = new ProcessBuilder("java", "-cp", currentPath, "main", "slave", Integer.toString(p), "127.0.0.1", Integer.toString(finger_table.get(0).port+p), Integer.toString(u.port), Integer.toString(finger_table.get(0).port));
         Process pr = pb.start();
         finger_table.put(p, new NodeEntry(p, "127.0.0.1", 3000 + p));
         System.out.println("Created node " + p);
+        while (join_lock) {}
     }
 
     public void jtest(int p) throws IOException {

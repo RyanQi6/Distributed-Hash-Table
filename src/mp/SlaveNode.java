@@ -58,6 +58,7 @@ public class SlaveNode extends Node {
         init_fingure_table();
         update_others();
         ask_transfer_keys(finger_table.get(0), predecessor_pointer.id, self_info.id);
+        u.unicast_send(client_info.address, client_info.port, "ResponseJoin");
     }
 
     public void init_fingure_table() {
