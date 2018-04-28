@@ -104,7 +104,7 @@ public class Client {
     // join
     public void join(int p) throws IOException {
         String currentPath = System.getProperty("user.dir");
-        ProcessBuilder pb = new ProcessBuilder( "/Users/liuyi/Desktop/Distributed-Hash-Table/out/production/Distributed-Hash-Table/main", Integer.toString(p));
+        ProcessBuilder pb = new ProcessBuilder( currentPath + "/main", Integer.toString(p));
         Process pr = pb.start();
         finger_table.put(p, new NodeEntry(p, "127.0.0.1", 3000 + p));
         System.out.println("Created node " + p);
