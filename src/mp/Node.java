@@ -29,7 +29,7 @@ public abstract class Node {
                 send_timer = sendHeartbeatTimer(delay);
 
                 try {
-                    System.out.println("predecessor id is: " + predecessor_pointer.id);
+//                    System.out.println("predecessor id is: " + predecessor_pointer.id);
                     u.c.startClient(predecessor_pointer.address, predecessor_pointer.port);
                 } catch (ConnectException e) {
                     return ;
@@ -263,7 +263,15 @@ public abstract class Node {
                         receivedHeartbeat();
                     } else if(command_mode == 3){
                         int k = Integer.parseInt(message.substring(thirdSplit + 2, message.length()-2));
-                        find(k);
+                        //start a new thread to avoid blocking listen() function
+                        Runnable listener = new Runnable() {
+                            @Override
+                            public void run() {
+                                find(k);
+                            }
+                        };
+                        new Thread(listener).start();
+
                     } else if(command_mode == 6) {
                         int fourthSplit = Utility.nthIndexOf(message, "||", 4);
                         int fifthSplit = Utility.nthIndexOf(message, "||", 5);
@@ -325,49 +333,19 @@ public abstract class Node {
 
     // find p k
     public void find(int k){
-        if(k < 255 && k >= 0){
-            if(this.key_container.contains(k)){
+        if(k < 0 || k > 255){
+            u.unicast_send(client_info.address, client_info.port, "5||" + k + "||key k is not found");
+            return;
+        }
+
+        NodeEntry successor = find_successor(k);
+        if(self_info.id == successor.id){
+            if(this.key_container.contains(k))
                 u.unicast_send(client_info.address, client_info.port, "4||" + this.self_info.id + "||" + k);
-            } else {
-//                 case 1: k is ahead of this node, k > this.node.id
-//                      1.1: k is in the range of [this.node.id, this.node.id + 128], then iterate through the ft, the first node larger than k is the target
-//                      1.2: k is not in that range, then let the last node in the ft to find k
-//                 case 2: k is behind the node, k < this.node.idd
-//                      2.1: k is not reachable with in one leap, meaning (k + 255 - this.node.id) > 128, then let the last node in the ft to find k
-//                      2.2: k is reachable in one leap, iterate through ft, this.node.id - k > 128
-//                         2.2.1: node.id >= 128, compare with k + 255
-//                         2.2.2: node.id < 128, compare with k, not possible
-                if(k - this.self_info.id > 0){
-                    for(int i=0; i<this.finger_table.size(); ++i){
-                        NodeEntry nextStep = this.finger_table.get(i);
-                        if(nextStep.id >= k){
-                            u.unicast_send(nextStep.address, nextStep.port, "3||"+ k);
-                            break;
-                        } else if(i == this.finger_table.size()-1){
-                            u.unicast_send(nextStep.address, nextStep.port, "3||" + k);
-                        }
-                    }
-                }else {
-                    if(this.self_info.id - k <= 128) {
-                        NodeEntry last_entry = this.finger_table.get(finger_table.size() - 1);
-                        u.unicast_send(last_entry.address, last_entry.port, "3||" + k);
-                    } else {
-                        boolean filled = false;
-                        for(int i=0; i<this.finger_table.size(); ++i){
-                            NodeEntry nextStep = this.finger_table.get(i);
-                            filled = nextStep.id < 128;
-                            if(!filled){
-                                continue;
-                            } else{
-                                if(nextStep.id >= k){
-                                    u.unicast_send(nextStep.address, nextStep.port, "3||" + k);
-                                    break;
-                                }
-                            }
-                        }
-                    }
-                }
-            }
+            else
+                u.unicast_send(client_info.address, client_info.port, "5||" + k + "||key k is not found");
+        } else {
+            u.unicast_send(successor.address, successor.port, "3||" + k);
         }
     }
 
