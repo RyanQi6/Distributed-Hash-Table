@@ -95,7 +95,7 @@ public class main {
                     for(int i = 0; i < F; ++i) {
                         int id = node_list.get(generator.nextInt(N));
                         int key = generator.nextInt(256);
-                        System.out.println("Ask " + id + " to find " + key);
+                        System.out.println(i + " Ask " + id + " to find " + key);
                         client.find(id, key);
                     }
                     num_msg_phase2 = client.get_total_num() - num_msg_phase1;
@@ -113,14 +113,14 @@ public class main {
                     System.out.println("Invalid command.");
             }
 
-        } else if(args[0].equals("slave") && args.length == 6) {
+        } else if(args[0].equals("slave") && args.length == 2) {
             //code for slave nodes.
 
             int id = Integer.parseInt(args[1]);
-            String address = args[2];
-            int node_port = Integer.parseInt(args[3]);
-            int client_port = Integer.parseInt(args[4]);
-            int master_port =  Integer.parseInt(args[5]);
+            String address = "127.0.0.1";
+            int node_port = 3000+id;
+            int client_port = 2999;
+            int master_port =  3000;
 
             //create slave node
             NodeEntry client_info = new NodeEntry(-1, address, client_port);
