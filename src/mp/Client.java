@@ -83,12 +83,14 @@ public class Client {
                     int fourthSplit = Utility.nthIndexOf(message,"||", 4);
                     int k = Integer.parseInt(message.substring(thirdSplit + 2, fourthSplit));
                     System.out.println("Key " + k + " not found.");
+                    find_lock = false;
                 } else if(command.equals("4")){
                     int thirdSplit = Utility.nthIndexOf(message, "||", 3);
                     int fourthSplit = Utility.nthIndexOf(message,"||", 4);
                     int node_id = Integer.parseInt(message.substring(thirdSplit + 2, fourthSplit));
                     int k = Integer.parseInt(message.substring(fourthSplit + 2, message.length()-2));
                     System.out.println("Key " + k + " is in node " + node_id);
+                    find_lock = false;
                 } else if(command.equals("ResponseMsgNum")){
                     msg_num = Integer.parseInt(message.substring(Utility.nthIndexOf(message, "||", 3) + 2, Utility.nthIndexOf(message, "||", 4)));
                     ask_msg_num_lock = false;
@@ -122,9 +124,13 @@ public class Client {
     }
 
     // find p k
-    public void find(int p, int k) {
-        if(finger_table.containsKey(p))
+    volatile boolean find_lock;
+    public void find(int p, int k) throws InterruptedException{
+        if(finger_table.containsKey(p)) {
+            find_lock = true;
             u.unicast_send(this.finger_table.get(p).address, this.finger_table.get(p).port, "3||" + k);
+            while (find_lock) { Thread.sleep(10); }
+        }
         else
             System.out.println("Node " + p + " does not exist.");
     }

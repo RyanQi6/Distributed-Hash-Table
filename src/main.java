@@ -92,6 +92,13 @@ public class main {
                         client.join(id);
                     }
                     num_msg_phase1 = client.get_total_num();
+                    for(int i = 0; i < F; ++i) {
+                        int id = node_list.get(generator.nextInt(N));
+                        int key = generator.nextInt(256);
+                        System.out.println("Ask " + id + " to find " + key);
+                        client.find(id, key);
+                    }
+                    num_msg_phase2 = client.get_total_num() - num_msg_phase1;
                     System.out.println("Performance Evaluation Result:");
                     System.out.println("N = " + N + ", F = " + F);
                     System.out.println(node_list);
