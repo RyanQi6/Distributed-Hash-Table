@@ -349,21 +349,19 @@ public abstract class Node {
             return;
         }
 
-        //if even the nearest node is greater than id, then this node is the successor
-        if(self_info.id == k || unwrap_id(finger_table.get(0).id) > unwrap_id(k))
+        NodeEntry successor = find_successor(k);
+        if(self_info.id == successor.id){
             if(this.key_container.contains(k))
                 u.unicast_send(client_info.address, client_info.port, "4||" + this.self_info.id + "||" + k);
             else
                 u.unicast_send(client_info.address, client_info.port, "5||" + k + "||key k is not found");
-        else {
-            //else, find the farthest node less than or equal to id and ask it to search for successor
-            for(int i = 0; i < 8; ++i) {
-                if(unwrap_id(finger_table.get(i).id) > unwrap_id(k))
-                    u.unicast_send(finger_table.get(i).address, finger_table.get(i).port, "3||" + k);
-            }
-            //if even the farthest node is less than id, ask the farthest to search for successor
-            u.unicast_send(finger_table.get(7).address, finger_table.get(7).port, "3||" + k);
+        } else {
+                u.unicast_send(successor.address, successor.port, "8||" + k);
         }
+        u.unicast_send(client_info.address, client_info.port, "Finished dealing with find. "
+                + ask_find_successor_lock + ask_closest_preceding_finger_lock + ask_return_predecessor_lock
+                + ask_set_predecessor_lock + ask_update_finger_table_lock + ask_read_finger_table_lock
+                + ask_alter_finger_table_lock + ask_transfer_keys_lock);
     }
 
     public void crash() {
