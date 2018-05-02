@@ -4,8 +4,8 @@ import java.net.ConnectException;
 import java.util.*;
 
 public abstract class Node {
-    public final int send_heartbeat_interval = 10000;  // 10s
-    public final int receive_waiting_limit = 20000;    // 30s
+    public final int send_heartbeat_interval = 5000;  // 5s
+    public final int receive_waiting_limit = 30000;    // 30s
 
     NodeEntry self_info;
     NodeEntry client_info;

@@ -42,7 +42,7 @@ public class Client {
         String message;
         while(true) {
             if ((message = u.unicast_receive()) != null) {
-                System.out.println("    Msg received: " + message);
+                System.out.println("    Client Msg received: " + message);
                 String sender_ip = message.substring(0, Utility.nthIndexOf(message, "||", 1));
                 Integer sender_port = Integer.parseInt(message.substring(Utility.nthIndexOf(message, "||", 1) + 2, Utility.nthIndexOf(message, "||", 2)));
 
